@@ -26,6 +26,10 @@
 	<string>We require access to the contacts</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string></string>
+	<key>NSUserActivityTypes</key>
+	<array>
+		<string>INStartCallIntent</string>
+	</array>
 	<key>SHARED_APP_GROUP_ID</key>
 	<string>group.cz.acrobits.softphone.demophone</string>
 	<key>UIBackgroundModes</key>

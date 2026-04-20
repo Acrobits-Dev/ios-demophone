@@ -5,6 +5,7 @@ import Combine
 import CommonCrypto
 import Softphone_Swift
 import WatchConnectivity
+import Intents
 
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 enum ImagePurpose
@@ -1110,6 +1111,17 @@ extension AppDelegate: UIApplicationDelegate
         })
         
         self.pushHandles[identifier] = handle
+    }
+    
+    func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
+        if userActivity.activityType == NSUserActivityTypeBrowsingWeb { return false }
+
+        if let intent = userActivity.interaction?.intent {
+            startSoftphoneSdk()
+            return Softphone_Cx.instance().processIntent(intent)
+        }
+
+        return false
     }
 }
 
