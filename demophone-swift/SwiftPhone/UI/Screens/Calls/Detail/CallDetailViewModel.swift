@@ -276,6 +276,14 @@ class CallDetailViewModel: ObservableObject {
         callService.reject(callItem.entry)
     }
     
+    func commandPressDown() {
+        callService.dtmfOn()
+    }
+    
+    func commandPressUp() {
+        callService.dtmfOff()
+    }
+    
     func getEntriesForSelection(type: CallInputType) -> [Entry] {
         switch type {
         case .join:

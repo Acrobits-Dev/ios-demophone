@@ -6,8 +6,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/acrobits/SoftphoneSwiftPackage-saas-video",
       "state" : {
-        "revision" : "28c61d9935369adff82ef21ab4f36c7bab3ad5d3",
-        "version" : "25.3.4"
+        "revision" : "edfdb1da302f0cf24448ccbfa0b1cb27f64d5a56",
+        "version" : "25.3.12"
       }
     },
     {

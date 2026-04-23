@@ -140,6 +140,15 @@ class CallService: NSObject {
         AppDelegate.theApp().toggleSpeaker()
     }
     
+    func dtmfOn() {
+        let key: Character = "*"
+        AppDelegate.theApp().dtmfOn(key: Int8(bitPattern: key.asciiValue!))
+    }
+    
+    func dtmfOff() {
+        AppDelegate.theApp().dtmfOff()
+    }
+    
     func transfer(entry: Entry) {
         var call: SoftphoneCallEvent
         

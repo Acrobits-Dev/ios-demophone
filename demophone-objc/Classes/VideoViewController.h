@@ -11,8 +11,12 @@
 
 #import <UIKit/UIKit.h>
 #import <Softphone/Softphone.h>
+
+#ifdef SOFTPHONE_VIDEO
 #import "Softphone/Video/SoftphoneVideoView.h"
 #import "Softphone/Video/SoftphoneVideoPreview.h"
+#endif
+
 #import "Ali/ali_array_set.h"
 
 /**

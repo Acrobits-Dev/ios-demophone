@@ -104,12 +104,19 @@ struct CallDetailView: View {
                 switch button {
                 case .speaker:
                     UserCallGridActionButton(isOn: $viewModel.isSpeakerOn,
-                                             button: button) {
+                                             button: button, onPressUp:  {
                         viewModel.toggleSpeaker()
-                    }
+                    })
+                case .command:
+                    UserCallGridActionButton(
+                            isOn: .constant(false),
+                            button: button,
+                            onPressDown: { viewModel.commandPressDown() },
+                            onPressUp:   { viewModel.commandPressUp() }
+                        )
                 default:
                     UserCallGridActionButton(isOn: .constant(false),
-                                             button: button) {
+                                             button: button, onPressUp:  {
                         switch button {
                         case .transfer:
                             viewModel.showTransferCall()
@@ -122,7 +129,7 @@ struct CallDetailView: View {
                         default:
                             break
                         }
-                    }
+                    })
                 }
             }
         }
@@ -135,34 +142,34 @@ struct CallDetailView: View {
                 switch button {
                 case .hold:
                     UserCallActionButton(isOn: $viewModel.isOnHold,
-                                         button: button) {
+                                         button: button, onPressUp:  {
                         viewModel.holdCall()
-                    }
+                    })
                 case .mute:
                     UserCallActionButton(isOn: $viewModel.isMuteOn,
-                                         button: button) {
+                                         button: button, onPressUp:  {
                         viewModel.muteCall()
-                    }
+                    })
                 case .answer:
                     UserCallActionButton(isOn: .constant(false),
-                                         button: button) {
+                                         button: button, onPressUp:  {
                         viewModel.answer()
-                    }
+                    })
                 case .reject:
                     UserCallActionButton(isOn: .constant(false),
-                                         button: button) {
+                                         button: button, onPressUp:  {
                         viewModel.reject()
-                    }
+                    })
                 default:
                     UserCallActionButton(isOn: .constant(false),
-                                         button: button) {
+                                         button: button, onPressUp:  {
                         switch button {
                         case .hangup:
                             viewModel.hangupCall()
                         default:
                             break
                         }
-                    }
+                    })
                 }
             }
          }
