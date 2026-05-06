@@ -38,7 +38,7 @@ class Entry: NSObject
         if let call = call {
             return call
         } else if let groupId = groupId {
-            let calls = SoftphoneBridge.instance()?.calls()?.conferences()?.getCalls(conference: groupId)
+            let calls = SoftphoneBridge.instance().calls()?.conferences()?.getCalls(conference: groupId)
             return calls?.first
         }
         return nil
@@ -46,7 +46,7 @@ class Entry: NSObject
     
     func getCallSize() -> Int {
         if let groupId = groupId {
-            return Int(SoftphoneBridge.instance()?.calls()?.conferences()?.getSize(groupId) ?? 0)
+            return Int(SoftphoneBridge.instance().calls()?.conferences()?.getSize(groupId) ?? 0)
         } else if let _ = call {
             return 1
         }
@@ -78,11 +78,11 @@ class CallsDataSource: NSObject
     {
         entries.removeAll()
         
-        if let groups = SoftphoneBridge.instance()?.calls()?.conferences()?.list() {
+        if let groups = SoftphoneBridge.instance().calls()?.conferences()?.list() {
             for groupId in groups {
                 entries.append(Entry(groupId: groupId))
                 
-                if let calls = SoftphoneBridge.instance()?.calls()?.conferences()?.getCalls(conference: groupId) {
+                if let calls = SoftphoneBridge.instance().calls()?.conferences()?.getCalls(conference: groupId) {
                     for call in calls {
                         entries.append(Entry(call: call));
                     }
@@ -129,8 +129,8 @@ extension CallsDataSource: UITableViewDelegate, UITableViewDataSource
         let entry = entries[indexPath.row]
         if entry.isGroup()
         {
-            let active = (SoftphoneBridge.instance()?.calls()?.conferences()?.getActive() == entry.groupId)
-            let size = SoftphoneBridge.instance()?.calls()?.conferences()?.getSize(entry.groupId)
+            let active = (SoftphoneBridge.instance().calls()?.conferences()?.getActive() == entry.groupId)
+            let size = SoftphoneBridge.instance().calls()?.conferences()?.getSize(entry.groupId!)
             
             cell.textLabel?.text = "Group (\(size!) calls)"
             cell.detailTextLabel?.text = active ? "active" : ""
@@ -142,11 +142,11 @@ extension CallsDataSource: UITableViewDelegate, UITableViewDataSource
             cell.textLabel?.text = "Call with \(entry.call?.getRemoteUser(index: 0)?.displayName! ?? "")"
             
             var isHeld = false
-            if let holdStates = SoftphoneBridge.instance().calls().isHeld(entry.call) {
+            if let holdStates = SoftphoneBridge.instance().calls()?.isHeld(entry.call!) {
                 isHeld = holdStates.local == CallHoldState_Held
             }
             
-            cell.detailTextLabel?.text = "\(CallState.toString((SoftphoneBridge.instance()?.calls()?.getState(entry.call))!) ?? ""), \(isHeld ? "on hold" : "active")"
+            cell.detailTextLabel?.text = "\(CallState.toString((SoftphoneBridge.instance().calls()?.getState(entry.call!))!)), \(isHeld ? "on hold" : "active")"
             
             cell.contentView.backgroundColor = UIColor(white: 1.0, alpha: 1.0)
         }

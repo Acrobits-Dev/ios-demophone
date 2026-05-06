@@ -36,7 +36,7 @@ class VideoViewModel: ObservableObject {
         var outgoingEnabled = false
         
         for call in callsWithVideos {
-            let streamAvailability = SoftphoneBridge.instance().calls().isVideoAvailable(call)
+            let streamAvailability = SoftphoneBridge.instance().calls()?.isVideoAvailable(call)
             if let streamAvailability = streamAvailability {
                 incomingEnabled = incomingEnabled || streamAvailability.incoming
                 outgoingEnabled = outgoingEnabled || streamAvailability.outgoing
@@ -49,7 +49,7 @@ class VideoViewModel: ObservableObject {
     
     private func loadCameras() {
         var videoCameras = [VideoCameraInfo]()
-        if let allCameras = SoftphoneBridge.instance().video().enumerateCameras() {
+        if let allCameras = SoftphoneBridge.instance().video()?.enumerateCameras() {
             for camera in allCameras {
                 if camera.id == "__black_camera__" || camera.id == "__null_camera__" {
                     continue
@@ -63,25 +63,23 @@ class VideoViewModel: ObservableObject {
     
     func toggleVideo() {
         if isOutgoingVideoEnabled {
-            if let callDesiredMedia = CallDesiredMedia(incomingVideoEnabled: isIncomingVideoEnabled, andOutgoingVideoEnabled: false) {
-                self.videoService.updateDesiredMedia(desiredMedia: callDesiredMedia)
-            }
+            let callDesiredMedia = CallDesiredMedia(incomingVideoEnabled: isIncomingVideoEnabled, andOutgoingVideoEnabled: false)
+            self.videoService.updateDesiredMedia(desiredMedia: callDesiredMedia)
         } else {
-            if let callDesiredMedia = CallDesiredMedia(incomingVideoEnabled: isIncomingVideoEnabled, andOutgoingVideoEnabled: true) {
-                self.videoService.updateDesiredMedia(desiredMedia: callDesiredMedia)
-            }
+            let callDesiredMedia = CallDesiredMedia(incomingVideoEnabled: isIncomingVideoEnabled, andOutgoingVideoEnabled: true)
+            self.videoService.updateDesiredMedia(desiredMedia: callDesiredMedia)
         }
     }
     
     func switchCamera() {
-        if let currentCameraInfo = SoftphoneBridge.instance().video().getCurrentCamera() {
+        if let currentCameraInfo = SoftphoneBridge.instance().video()?.getCurrentCamera() {
             let cameraInfo = cameras.first { $0.id != currentCameraInfo.id }
-            SoftphoneBridge.instance().video().switchCamera(info: cameraInfo)
+            SoftphoneBridge.instance().video()?.switchCamera(info: cameraInfo!)
         }
     }
     
     func endCall() {
-        if let activeGroup = SoftphoneBridge.instance().calls().conferences().getActive() {
+        if let activeGroup = SoftphoneBridge.instance().calls()?.conferences()?.getActive() {
             if activeGroup.isEmpty {
                 return
             }

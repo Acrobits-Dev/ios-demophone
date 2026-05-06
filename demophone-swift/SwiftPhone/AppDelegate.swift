@@ -74,7 +74,7 @@ class AppDelegate: UIResponder
     func registerForPushNotifications()
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
-        guard let preferences = SoftphoneBridge.instance()?.settings()?.getPreferences() else {
+        guard let preferences = SoftphoneBridge.instance().settings()?.getPreferences() else {
             return
         }
         
@@ -95,7 +95,7 @@ class AppDelegate: UIResponder
     func isRegistrationInActive() -> Bool
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
-        let currentState = SoftphoneBridge.instance()?.registration()?.getRegistrationState(accountId: "sip")
+        let currentState = SoftphoneBridge.instance().registration()?.getRegistrationState(accountId: "sip")
         
         switch currentState
         {
@@ -123,15 +123,15 @@ class AppDelegate: UIResponder
     {
         var terminalCalls = [SoftphoneCallEvent]()
         
-        if let groups = SoftphoneBridge.instance()?.calls()?.conferences()?.list()
+        if let groups = SoftphoneBridge.instance().calls()?.conferences()?.list()
         {
             for groupId in groups
             {
-                if let calls = SoftphoneBridge.instance()?.calls()?.conferences()?.getCalls(conference: groupId)
+                if let calls = SoftphoneBridge.instance().calls()?.conferences()?.getCalls(conference: groupId)
                 {
                     for call in calls
                     {
-                        let callState = SoftphoneBridge.instance()?.calls()?.getState(call)
+                        let callState = SoftphoneBridge.instance().calls()?.getState(call)
                         if CallState.isTerminal(callState!)
                         {
                             terminalCalls.append(call)
@@ -142,7 +142,7 @@ class AppDelegate: UIResponder
             
             for call in terminalCalls
             {
-                SoftphoneBridge.instance()?.calls()?.close(call)
+                SoftphoneBridge.instance().calls()?.close(call)
             }
         }
     }
@@ -160,14 +160,14 @@ class AppDelegate: UIResponder
         let call = SoftphoneCallEvent.create(withAccountId: "sip", uri: number)
         let stream = SoftphoneEventStream.load(SoftphoneStreamQuery.legacyCallHistoryStreamKey())
         
-        call?.setStream(stream)
+        call.setStream(stream!)
         
-        if let callTransients = call?.transients {
+        if let callTransients = call.transients {
             callTransients.set(dialAction, forKey: "dialAction")
-            call?.transients = callTransients
+            call.transients = callTransients
         }
         
-        let result = SoftphoneBridge.instance()?.events()?.post(call)
+        let result = SoftphoneBridge.instance().events()?.post(call)
         debugPrint(result as Any)
         
         if result == PostResult_Success {
@@ -184,8 +184,9 @@ class AppDelegate: UIResponder
     func startSimulatedMicrophone()
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
-        let soundFilePath = Bundle.main.path(forResource: "eliseb", ofType: "wav")
-        SoftphoneBridge.instance()?.calls().startSimulatedMicrophone(soundToPlay: soundFilePath, playOnce: true)
+        if let soundFilePath = Bundle.main.path(forResource: "eliseb", ofType: "wav") {
+            SoftphoneBridge.instance().calls()?.startSimulatedMicrophone(soundToPlay: soundFilePath, playOnce: true)
+        }
     }
     
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
@@ -193,7 +194,7 @@ class AppDelegate: UIResponder
     func stopSimulatedMicrophone()
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
-        SoftphoneBridge.instance()?.calls().stopSimulatedMicrophone()
+        SoftphoneBridge.instance().calls()?.stopSimulatedMicrophone()
     }
     
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
@@ -201,8 +202,8 @@ class AppDelegate: UIResponder
     func toggleMute()
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
-        let newMute = (SoftphoneBridge.instance()?.audio()?.isMuted())
-        SoftphoneBridge.instance()?.audio()?.setMuted(!newMute!)
+        let newMute = (SoftphoneBridge.instance().audio()?.isMuted())
+        SoftphoneBridge.instance().audio()?.setMuted(!newMute!)
         
         refreshCallViews()
     }
@@ -212,8 +213,8 @@ class AppDelegate: UIResponder
     func toggleSpeaker()
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
-        let newSpeaker = SoftphoneBridge.instance()?.audio()?.getCallAudioRoute() != AudioRoute_Speaker
-        SoftphoneBridge.instance()?.audio()?.setCallAudioRoute(route: newSpeaker ? AudioRoute_Speaker : AudioRoute_Receiver)
+        let newSpeaker = SoftphoneBridge.instance().audio()?.getCallAudioRoute() != AudioRoute_Speaker
+        SoftphoneBridge.instance().audio()?.setCallAudioRoute(route: newSpeaker ? AudioRoute_Speaker : AudioRoute_Receiver)
         
         refreshCallViews()
     }
@@ -261,15 +262,15 @@ class AppDelegate: UIResponder
     func toggleActiveGroup(groupId: String)
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
-        let wasActive = SoftphoneBridge.instance()?.calls()?.conferences()?.getActive() == groupId
+        let wasActive = SoftphoneBridge.instance().calls()?.conferences()?.getActive() == groupId
         
         if wasActive
         {
-            SoftphoneBridge.instance()?.calls()?.conferences()?.setActive(nil)
+            SoftphoneBridge.instance().calls()?.conferences()?.setActive(nil)
         }
         else
         {
-            SoftphoneBridge.instance()?.calls()?.conferences()?.setActive(groupId)
+            SoftphoneBridge.instance().calls()?.conferences()?.setActive(groupId)
         }
     }
     
@@ -277,16 +278,16 @@ class AppDelegate: UIResponder
     func putActiveCallOnHold()
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
-        guard let activeGroupId = SoftphoneBridge.instance()?.calls()?.conferences()?.getActive() else
+        guard let activeGroupId = SoftphoneBridge.instance().calls()?.conferences()?.getActive() else
         {
             return
         }
         
-        if let calls = SoftphoneBridge.instance()?.calls()?.conferences()?.getCalls(conference: activeGroupId)
+        if let calls = SoftphoneBridge.instance().calls()?.conferences()?.getCalls(conference: activeGroupId)
         {
             for call in calls
             {
-                SoftphoneBridge.instance()?.calls()?.setHeld(call, held: true)
+                SoftphoneBridge.instance().calls()?.setHeld(call, held: true)
             }
         }
     }
@@ -296,12 +297,12 @@ class AppDelegate: UIResponder
     func toggleHoldForCall(call: SoftphoneCallEvent)
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
-        let holdStates = SoftphoneBridge.instance()?.calls()?.isHeld(call)
+        let holdStates = SoftphoneBridge.instance().calls()?.isHeld(call)
         let newHeld = holdStates?.local != CallHoldState_Held
         
         if newHeld
         {
-            SoftphoneBridge.instance()?.registration()?.includeNonStandardSipHeader(accountId: "sip",
+            SoftphoneBridge.instance().registration()?.includeNonStandardSipHeader(accountId: "sip",
                                                                                     method: "INVITE",
                                                                                     responseCode: "",
                                                                                     name: "X-HoldCause",
@@ -309,17 +310,17 @@ class AppDelegate: UIResponder
         }
         else
         {
-            SoftphoneBridge.instance()?.registration()?.excludeNonStandardSipHeader(accountId: "sip",
+            SoftphoneBridge.instance().registration()?.excludeNonStandardSipHeader(accountId: "sip",
                                                                                     method: "INVITE",
                                                                                     responseCode: "",
                                                                                     name: "X-HoldCause")
         }
         
-        SoftphoneBridge.instance()?.calls()?.setHeld(call, held: newHeld)
+        SoftphoneBridge.instance().calls()?.setHeld(call, held: newHeld)
         
         if !newHeld
         {
-            let size = SoftphoneBridge.instance()?.calls()?.conferences()?.getSize(call: call)
+            let size = SoftphoneBridge.instance().calls()?.conferences()?.getSize(call: call)
             
             if size == 1
             {
@@ -327,7 +328,7 @@ class AppDelegate: UIResponder
                 // make the microphone output mix-into the conversation, otherwise it
                 // doesn't make much sense
                 
-                SoftphoneBridge.instance()?.calls()?.conferences()?.setActive(call: call)
+                SoftphoneBridge.instance().calls()?.conferences()?.setActive(call: call)
             }
         }
     }
@@ -338,14 +339,14 @@ class AppDelegate: UIResponder
     func answerIncomingCall(call: SoftphoneCallEvent)
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
-        let callState = SoftphoneBridge.instance()?.calls()?.getState(call)
+        let callState = SoftphoneBridge.instance().calls()?.getState(call)
         
         if callState != CallState_IncomingRinging && callState != CallState_IncomingIgnored
         {
             return
         }
         
-        SoftphoneBridge.instance()?.calls()?.answerIncoming(call: call, media: currentDesiredMedia())
+        SoftphoneBridge.instance().calls()?.answerIncoming(call: call, media: currentDesiredMedia())
     }
     
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
@@ -353,15 +354,15 @@ class AppDelegate: UIResponder
     func rejectIncomingCall(call: SoftphoneCallEvent)
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
-        let callState = SoftphoneBridge.instance()?.calls()?.getState(call)
+        let callState = SoftphoneBridge.instance().calls()?.getState(call)
         
         if callState != CallState_IncomingRinging && callState != CallState_IncomingIgnored
         {
             return
         }
         
-        SoftphoneBridge.instance()?.calls()?.rejectIncomingHere(call)
-        SoftphoneBridge.instance()?.calls()?.close(call)
+        SoftphoneBridge.instance().calls()?.rejectIncomingHere(call)
+        SoftphoneBridge.instance().calls()?.close(call)
     }
     
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
@@ -369,7 +370,7 @@ class AppDelegate: UIResponder
     func hangup(call: SoftphoneCallEvent)
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
-        SoftphoneBridge.instance()?.calls()?.close(call)
+        SoftphoneBridge.instance().calls()?.close(call)
     }
     
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
@@ -377,11 +378,11 @@ class AppDelegate: UIResponder
     func hangupGroup(groupId: String)
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
-        if let calls = SoftphoneBridge.instance()?.calls()?.conferences()?.getCalls(conference: groupId)
+        if let calls = SoftphoneBridge.instance().calls()?.conferences()?.getCalls(conference: groupId)
         {
             for call in calls
             {
-                SoftphoneBridge.instance()?.calls()?.close(call)
+                SoftphoneBridge.instance().calls()?.close(call)
             }
         }
     }
@@ -390,7 +391,7 @@ class AppDelegate: UIResponder
     func getStatistics(call: SoftphoneCallEvent) -> CallStatistics
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
-        return (SoftphoneBridge.instance()?.calls()?.getStatistics(call))!
+        return (SoftphoneBridge.instance().calls()?.getStatistics(call))!
     }
     
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
@@ -398,7 +399,7 @@ class AppDelegate: UIResponder
     func dtmfOn(key: Int8)
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
-        SoftphoneBridge.instance()?.audio()?.dtmf(on: key)
+        SoftphoneBridge.instance().audio()?.dtmf(on: key)
     }
     
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
@@ -406,7 +407,7 @@ class AppDelegate: UIResponder
     func dtmfOff()
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
-        SoftphoneBridge.instance()?.audio()?.dtmfOff()
+        SoftphoneBridge.instance().audio()?.dtmfOff()
     }
     
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
@@ -414,8 +415,8 @@ class AppDelegate: UIResponder
     func dumpLog()
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
-        let log = SoftphoneBridge.instance()?.log()?.get() ?? ""
-        SoftphoneBridge.instance()?.log()?.clear()
+        let log = SoftphoneBridge.instance().log()?.get() ?? ""
+        SoftphoneBridge.instance().log()?.clear()
         
         debugPrint("=============================================")
         debugPrint(log)
@@ -427,7 +428,7 @@ class AppDelegate: UIResponder
     func joinCall(call: SoftphoneCallEvent, group: String)
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
-        SoftphoneBridge.instance()?.calls()?.conferences()?.move(call: call, conference: group)
+        SoftphoneBridge.instance().calls()?.conferences()?.move(call: call, conference: group)
     }
     
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
@@ -435,7 +436,7 @@ class AppDelegate: UIResponder
     func splitCall(call: SoftphoneCallEvent)
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
-        SoftphoneBridge.instance()?.calls()?.conferences()?.split(call: call, activate: true)
+        SoftphoneBridge.instance().calls()?.conferences()?.split(call: call, activate: true)
     }
     
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
@@ -443,11 +444,11 @@ class AppDelegate: UIResponder
     func splitGroup(groupId: String)
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
-        if let calls = SoftphoneBridge.instance()?.calls()?.conferences()?.getCalls(conference: groupId)
+        if let calls = SoftphoneBridge.instance().calls()?.conferences()?.getCalls(conference: groupId)
         {
             for call in calls
             {
-                SoftphoneBridge.instance()?.calls()?.conferences()?.split(call: call, activate: false)
+                SoftphoneBridge.instance().calls()?.conferences()?.split(call: call, activate: false)
             }
         }
     }
@@ -473,9 +474,9 @@ class AppDelegate: UIResponder
         let newCall = SoftphoneCallEvent.create(withAccountId: "sip", uri: number)
         let stream = SoftphoneEventStream.load(SoftphoneStreamQuery.legacyCallHistoryStreamKey())
         
-        newCall?.setStream(stream)
+        newCall.setStream(stream!)
         
-        SoftphoneBridge.instance()?.calls()?.conferences()?.transfer(call: call, target: newCall)
+        SoftphoneBridge.instance().calls()?.conferences()?.transfer(call: call, target: newCall)
     }
     
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
@@ -483,7 +484,7 @@ class AppDelegate: UIResponder
     func attendedTransfer(from: SoftphoneCallEvent, to: SoftphoneCallEvent)
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
-        SoftphoneBridge.instance()?.calls()?.conferences()?.attendedTransfer(call: from, target: to)
+        SoftphoneBridge.instance().calls()?.conferences()?.attendedTransfer(call: from, target: to)
     }
     
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
@@ -507,7 +508,7 @@ class AppDelegate: UIResponder
         message.addRemoteUser(SoftphoneRemoteUser(streamParty: party))
         message.setAccount(defaultAccount)
         
-        let result = SoftphoneBridge.instance()?.events()?.post(message)
+        let result = SoftphoneBridge.instance().events()?.post(message)
         debugPrint(result as Any)
         
         if result != PostResult_Success
@@ -530,10 +531,7 @@ class AppDelegate: UIResponder
             return
         }
         
-        guard let att = SoftphoneEventAttachment(contentType: "image/jpeg", path: "") else {
-            return
-        }
-        
+        let att = SoftphoneEventAttachment(contentType: "image/jpeg", path: "")
         store(image: image, attachment: att, purpose: .payload)
         store(image: image, attachment: att, purpose: .networkPreview)
         store(image: image, attachment: att, purpose: .localPreview)
@@ -551,7 +549,7 @@ class AppDelegate: UIResponder
         
         message.addAttachment(attachment: att)
         
-        let result = SoftphoneBridge.instance()?.events()?.post(message)
+        let result = SoftphoneBridge.instance().events()?.post(message)
         debugPrint(result as Any)
         
         if result != PostResult_Success
@@ -580,13 +578,13 @@ class AppDelegate: UIResponder
     private func displayIncomingCallNotificationForWatch(_ call: SoftphoneCallEvent)
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
-        let notify = call.transients.get(key: SoftphoneTransientsNotifications.notifyUser).asBool()
+        let notify = call.transients?.get(key: SoftphoneTransientsNotifications.notifyUser)?.asBool()
         let isWatchConnected = WCSession.isSupported() && WCSession.default.isPaired
         let isInBackround = UIApplication.shared.applicationState == .background
         
-        if notify && isWatchConnected && isInBackround {
+        if notify! && isWatchConnected && isInBackround {
             let content = UNMutableNotificationContent()
-            content.body = "Incoming Call from " + call.getRemoteUser(index: 0).displayName
+            content.body = "Incoming Call from " + (call.getRemoteUser(index: 0)?.displayName ?? "")
             content.sound = .default
 
             let request = UNNotificationRequest(
@@ -642,11 +640,11 @@ class AppDelegate: UIResponder
         let toPath = SoftphoneEventAttachment.expandPath(filePath)
         let toPathWithoutFileName = SoftphoneEventAttachment.expandPath(pathWithoutFileName)
         
-        if !FileManager.default.fileExists(atPath: toPathWithoutFileName!)
+        if !FileManager.default.fileExists(atPath: toPathWithoutFileName)
         {
             do
             {
-                try FileManager.default.createDirectory(atPath: toPathWithoutFileName!,
+                try FileManager.default.createDirectory(atPath: toPathWithoutFileName,
                                                         withIntermediateDirectories: true,
                                                         attributes: nil)
             }
@@ -658,7 +656,7 @@ class AppDelegate: UIResponder
         
         do
         {
-            let u = URL(fileURLWithPath: toPath!)
+            let u = URL(fileURLWithPath: toPath)
             try data.write(to: u, options: .atomic)
         }
         catch
@@ -687,7 +685,7 @@ class AppDelegate: UIResponder
     func scheduleMissedCallNotification(call: SoftphoneCallEvent, delay: TimeInterval = 0.5)
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
-        let threadId = call.getRemoteUser(index: 0).transportUri.usernameFromUri()
+        let threadId = call.getRemoteUser(index: 0)?.transportUri!.usernameFromUri()
         
         /// The reason behind creating a notification request identifier is to match the identifier
         /// of the remote notification to avoid duplication of notifications in the notification center.
@@ -695,7 +693,7 @@ class AppDelegate: UIResponder
 
         let content = UNMutableNotificationContent()
         content.threadIdentifier = threadId!
-        content.title = call.getRemoteUser(index: 0).displayName
+        content.title = call.getRemoteUser(index: 0)?.displayName ?? ""
         content.body = "Missed Call"
         content.sound = .default
 
@@ -786,10 +784,10 @@ class AppDelegate: UIResponder
     private func updateLocalPushSettingsIfNeeded()
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
-        if let enabledAccounts = SoftphoneBridge.instance().registration().getEnabledAccounts() {
+        if let enabledAccounts = SoftphoneBridge.instance().registration()?.getEnabledAccounts() {
             var shouldConfigurePushManager = false
             for accountId in enabledAccounts {
-                if let account = SoftphoneBridge.instance().registration().getAccount(accountId: accountId),
+                if let account = SoftphoneBridge.instance().registration()?.getAccount(accountId: accountId),
                     account.getString("icm") == "localPush"
                 {
                     shouldConfigurePushManager = true
@@ -818,8 +816,8 @@ class AppDelegate: UIResponder
                     config.adminUsername = "admin"
                     config.adminPassword = "admin"
                     config.sendKeepAlives = true
-                    config.checksums = SoftphoneBridge.instance().registration().getLocalPushAccountChecksums()
-                    config.postData = SoftphoneBridge.instance().registration().getLocalPushData()
+                    config.checksums = SoftphoneBridge.instance().registration()?.getLocalPushAccountChecksums() ?? []
+                    config.postData = SoftphoneBridge.instance().registration()?.getLocalPushData() ?? []
                     
                     NEAppPushManagerHandler.instance.update(config: config) { error in
                         if let error = error {
@@ -842,9 +840,9 @@ class AppDelegate: UIResponder
         startSoftphoneSdk()
         
         let xml = XmlTree.from(dictionary: userInfo)
-        print("XML: \(xml?.toString(true) ?? "")" )
+        print("XML: \(xml.toString(true) ?? "")" )
         
-        SoftphoneBridge.instance()?.notifications()?.push()?.handle(xml, usage: PushTokenUsage_IncomingCall, completion: nil)
+        SoftphoneBridge.instance().notifications()?.push()?.handle(xml, usage: PushTokenUsage_IncomingCall, completion: nil)
     }
 }
 
@@ -895,34 +893,34 @@ extension AppDelegate: UIApplicationDelegate
             let softphoneInstance = SoftphoneBridge.instance()
             
             if sdkState == .stopped {
-                softphoneInstance?.state()?.respawn()
+                softphoneInstance.state()?.respawn()
                 sdkState = .running
                 return
             }
             
-            softphoneInstance?.log()?.setCustomSink(serializer)
-            softphoneInstance?.settings()?.getPreferences()?.trafficLogging = true
+            softphoneInstance.log()?.setCustomSink(serializer!)
+            softphoneInstance.settings()?.getPreferences()?.trafficLogging = true
             
             softphoneObserverProxy = SoftphoneObserverProxyBridge()
             softphoneObserverProxy.delegate = self;
-            softphoneInstance?.setObserver(softphoneObserverProxy)
+            softphoneInstance.setObserver(softphoneObserverProxy)
             
             sipAccount = XmlTree.parse(sip_account)
             
             let s = sipAccount?.toString(true);
             debugPrint("Account XML: \(s!)");
             
-            if let _ = softphoneInstance?.registration().getAccount(accountId: "sip") {
+            if let _ = softphoneInstance.registration()?.getAccount(accountId: "sip") {
                 DispatchQueue.main.async { [weak self] in
                     self?.updateLocalPushSettingsIfNeeded()
                 }
             }
             else {
-                softphoneInstance?.registration()?.saveAccount(sipAccount)
-                softphoneInstance?.registration()?.updateAll()
+                softphoneInstance.registration()?.saveAccount(sipAccount)
+                softphoneInstance.registration()?.updateAll()
             }
             
-            Softphone_Cx.instance()?.delegate = self
+            Softphone_Cx.instance().delegate = self
             
             sdkState = .running
         }
@@ -965,10 +963,10 @@ extension AppDelegate: UIApplicationDelegate
         }
         
         sdkState = .terminating
-        SoftphoneBridge.instance().state().terminate()
+        SoftphoneBridge.instance().state()?.terminate()
         
         terminatingTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [self] timer in
-            if !SoftphoneBridge.instance().state().isTerminated() {
+            if !(SoftphoneBridge.instance().state()?.isTerminated() ?? true) {
                 return
             }
             
@@ -1059,12 +1057,12 @@ extension AppDelegate: UIApplicationDelegate
     {
         debugPrint("Got remote-notification token")
         
-        guard let dualPushes = SoftphoneBridge.instance()?.settings()?.getPreferences().dualPushes else {
+        guard let dualPushes = SoftphoneBridge.instance().settings()?.getPreferences()?.dualPushes else {
             return
         }
         
         let usage = dualPushes ? PushTokenUsage_Other : PushTokenUsage_All
-        SoftphoneBridge.instance()?.notifications()?.push()?.setRegistrationId(token: deviceToken, usage: usage)
+        SoftphoneBridge.instance().notifications()?.push()?.setRegistrationId(token: deviceToken, usage: usage)
     }
     
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
@@ -1073,9 +1071,9 @@ extension AppDelegate: UIApplicationDelegate
     {
         debugPrint("Did fail to get remote-notification token")
         
-        let usage = (SoftphoneBridge.instance()?.settings()?.getPreferences().dualPushes)! ? PushTokenUsage_Other : PushTokenUsage_All
+        let usage = (SoftphoneBridge.instance().settings()?.getPreferences()?.dualPushes)! ? PushTokenUsage_Other : PushTokenUsage_All
         
-        SoftphoneBridge.instance()?.notifications()?.push()?.setRegistrationId(token: nil, usage: usage)
+        SoftphoneBridge.instance().notifications()?.push()?.setRegistrationId(token: nil, usage: usage)
     }
     
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
@@ -1088,11 +1086,11 @@ extension AppDelegate: UIApplicationDelegate
         let identifier = UUID().uuidString
         
         let xml = XmlTree.from(dictionary: userInfo)
-        print("XML: \(xml?.toString(true) ?? "")" )
+        print("XML: \(xml.toString(true) ?? "")" )
         
-        let handle = SoftphoneBridge.instance()?.notifications()?.push()?.handle(xml, usage: PushTokenUsage_Other, completion: { (info) in
+        let handle = SoftphoneBridge.instance().notifications()?.push()?.handle(xml, usage: PushTokenUsage_Other, completion: { (info) in
             
-            switch info?.result
+            switch info.result
             {
             case PushNotificationCompletionInfoResult_NewData:
                 completionHandler(UIBackgroundFetchResult.newData)
@@ -1156,7 +1154,7 @@ extension AppDelegate: SoftphoneDelegateBridge
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-    func onMissedCalls(_ callEvents: [SoftphoneCallEvent]!)
+    func onMissedCalls(_ callEvents: [SoftphoneCallEvent])
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
         for call in callEvents {
@@ -1165,66 +1163,66 @@ extension AppDelegate: SoftphoneDelegateBridge
     }
     
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-    func onPushTestScheduled(accountId: String!, result: PushTestScheduleResultType)
+    func onPushTestScheduled(accountId: String, result: PushTestScheduleResultType)
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
         
     }
     
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-    func onPushTestArrived(_ accountId: String!)
+    func onPushTestArrived(_ accountId: String)
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
         
     }
     
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-    func getRingtonePath(_ call: SoftphoneCallEvent!) -> String!
+    func getRingtonePath(_ call: SoftphoneCallEvent) -> String
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
         var resourcePath = Bundle.main.resourcePath;
         resourcePath?.append("/dm.wav")
         
-        return resourcePath
+        return resourcePath ?? ""
     }
     
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-    func onComposingInfo(_ info: SoftphoneMessagingComposingInfo!)
+    func onComposingInfo(_ info: SoftphoneMessagingComposingInfo)
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
         
     }
     
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-    func onDialogEvent(accountId: String!)
+    func onDialogEvent(accountId: String)
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
         
     }
     
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-    func onVoicemail(voicemail: VoicemailRecord!, accountId: String!)
+    func onVoicemail(voicemail: VoicemailRecord, accountId: String)
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
         
     }
     
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-    func onBalance(balance: BalanceRecord!, accountId: String!)
+    func onBalance(balance: BalanceRecord, accountId: String)
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
         
     }
     
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-    func onEventsChanged(events: SoftphoneChangedEvents!, streams: SoftphoneChangedStreams!)
+    func onEventsChanged(events: SoftphoneChangedEvents, streams: SoftphoneChangedStreams)
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
         refreshCallViews()
     }
     
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-    func onMediaStatusChanged(media: CallMediaStatus!, call: SoftphoneCallEvent!)
+    func onMediaStatusChanged(media: CallMediaStatus, call: SoftphoneCallEvent)
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {   
         refreshCallViews()
@@ -1238,7 +1236,7 @@ extension AppDelegate: SoftphoneDelegateBridge
     }
     
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-    func onRegistrationStateChanged(state: RegistratorStateType, accountId: String!)
+    func onRegistrationStateChanged(state: RegistratorStateType, accountId: String)
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
         registrationService.state.send(state)
@@ -1259,7 +1257,7 @@ extension AppDelegate: SoftphoneDelegateBridge
     }
     
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-    func onNewEvent(_ event: SoftphoneEvent!)
+    func onNewEvent(_ event: SoftphoneEvent)
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
         if event.isCall()
@@ -1267,7 +1265,7 @@ extension AppDelegate: SoftphoneDelegateBridge
             closeTerminalCalls()
             refreshCallViews()
             
-            displayIncomingCallNotificationForWatch(event.asCall())
+            displayIncomingCallNotificationForWatch(event.asCall()!)
         }
         else
         {
@@ -1280,7 +1278,7 @@ extension AppDelegate: SoftphoneDelegateBridge
     }
     
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-    func onCallStateChanged(state: CallStateType, call: SoftphoneCallEvent!)
+    func onCallStateChanged(state: CallStateType, call: SoftphoneCallEvent)
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
         closeTerminalCalls()
@@ -1288,7 +1286,7 @@ extension AppDelegate: SoftphoneDelegateBridge
     }
     
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-    func onHoldStateChanged(states: CallHoldStates!, call: SoftphoneCallEvent!)
+    func onHoldStateChanged(states: CallHoldStates, call: SoftphoneCallEvent)
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
         refreshCallViews()
@@ -1302,19 +1300,19 @@ extension AppDelegate: SoftphoneDelegateBridge
     }
     
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-    func onNetworkCertificateVerificationFailed(host: String!, certificateHash: String!)
+    func onNetworkCertificateVerificationFailed(host: String, certificateHash: String)
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
         if securityAlerts[host] == nil
         {
-            let alert = UIAlertController(title: "Security Warning", message: "The certificate for domain \(host ?? "") is not valid or has expired", preferredStyle: .alert);
+            let alert = UIAlertController(title: "Security Warning", message: "The certificate for domain \(host) is not valid or has expired", preferredStyle: .alert);
             
             alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: { _ in
                 self.securityAlerts.removeValue(forKey: host)
             }))
             
             alert.addAction(UIAlertAction(title: "Trust", style: .default, handler: { _ in
-                SoftphoneBridge.instance().network().certificates().addException(host: host, hash: certificateHash)
+                SoftphoneBridge.instance().network()?.certificates()?.addException(host: host, hash: certificateHash)
                 self.securityAlerts.removeValue(forKey: host)
             }))
             
@@ -1346,12 +1344,12 @@ extension AppDelegate: PKPushRegistryDelegate
     func pushRegistry(_ registry: PKPushRegistry, didUpdate pushCredentials: PKPushCredentials, for type: PKPushType)
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
-        guard let dualPushes = SoftphoneBridge.instance()?.settings()?.getPreferences().dualPushes else {
+        guard let dualPushes = SoftphoneBridge.instance().settings()?.getPreferences()?.dualPushes else {
             return
         }
         
         let usage = dualPushes ? PushTokenUsage_IncomingCall : PushTokenUsage_All
-        SoftphoneBridge.instance()?.notifications()?.push()?.setRegistrationId(token: pushCredentials.token, usage: usage)
+        SoftphoneBridge.instance().notifications()?.push()?.setRegistrationId(token: pushCredentials.token, usage: usage)
     }
     
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
@@ -1367,7 +1365,7 @@ extension AppDelegate: Softphone_Cx_Delegate
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-    func cxCallUpdate(_ callUpdate: CXCallUpdate!, forCall call: SoftphoneCallEvent!)
+    func cxCallUpdate(_ callUpdate: CXCallUpdate, forCall call: SoftphoneCallEvent)
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
         

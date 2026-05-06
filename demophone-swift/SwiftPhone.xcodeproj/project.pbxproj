@@ -10,6 +10,7 @@
 		5757E69C2508D57F00DD3ED0 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5757E69B2508D57F00DD3ED0 /* AppDelegate.swift */; };
 		5757E6A52508D58200DD3ED0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5757E6A42508D58200DD3ED0 /* Assets.xcassets */; };
 		5757E6A82508D58200DD3ED0 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5757E6A62508D58200DD3ED0 /* LaunchScreen.storyboard */; };
+		C20241462FA9E4880020617A /* SoftphoneSwiftPackage-saas-video in Frameworks */ = {isa = PBXBuildFile; productRef = C20241452FA9E4880020617A /* SoftphoneSwiftPackage-saas-video */; };
 		C214B4F62EE1E680006B6B47 /* VideoScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C214B4F52EE1E680006B6B47 /* VideoScreenView.swift */; };
 		C214B4F82EE1E68E006B6B47 /* VideoViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C214B4F72EE1E68E006B6B47 /* VideoViewModel.swift */; };
 		C218F4712D0C64C6000FCA01 /* SwiftPackage-sipisprovider in Frameworks */ = {isa = PBXBuildFile; productRef = C218F4702D0C64C6000FCA01 /* SwiftPackage-sipisprovider */; };
@@ -23,7 +24,6 @@
 		C28857162A8E787F00E048F2 /* TargetPickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C28857152A8E787F00E048F2 /* TargetPickerViewController.swift */; };
 		C2A2B2D22542C79E0056B21C /* PushKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C2A2B2D12542C79E0056B21C /* PushKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		C2AE94432EE9BB53009613CB /* VideoService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2AE94422EE9BB53009613CB /* VideoService.swift */; };
-		C2BF95EA2EF47B9E00307AD4 /* SoftphoneSwiftPackage-saas-video in Frameworks */ = {isa = PBXBuildFile; productRef = C2BF95E92EF47B9E00307AD4 /* SoftphoneSwiftPackage-saas-video */; };
 		C2C3BEE02C1ACDBD0024838A /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C2C3BEDF2C1ACDBD0024838A /* NetworkExtension.framework */; };
 		C2C3BEE32C1ACDBD0024838A /* AppProxyProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2C3BEE22C1ACDBD0024838A /* AppProxyProvider.swift */; };
 		C2C3BEE82C1ACDBD0024838A /* NetworkExtensionSwiftPhone.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = C2C3BEDE2C1ACDBD0024838A /* NetworkExtensionSwiftPhone.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -222,7 +222,7 @@
 				C2FE6A28254496D7009FB20D /* Security.framework in Frameworks */,
 				C2FE6A26254496CD009FB20D /* SystemConfiguration.framework in Frameworks */,
 				C2FE6A24254496C8009FB20D /* QuartzCore.framework in Frameworks */,
-				C2BF95EA2EF47B9E00307AD4 /* SoftphoneSwiftPackage-saas-video in Frameworks */,
+				C20241462FA9E4880020617A /* SoftphoneSwiftPackage-saas-video in Frameworks */,
 				C2FE6A22254496BF009FB20D /* CoreMedia.framework in Frameworks */,
 				C2FE6A20254496B9009FB20D /* CoreVideo.framework in Frameworks */,
 				C2FE6A1E254496B1009FB20D /* CoreText.framework in Frameworks */,
@@ -518,7 +518,7 @@
 			);
 			name = SwiftPhone;
 			packageProductDependencies = (
-				C2BF95E92EF47B9E00307AD4 /* SoftphoneSwiftPackage-saas-video */,
+				C20241452FA9E4880020617A /* SoftphoneSwiftPackage-saas-video */,
 			);
 			productName = SwiftPhone;
 			productReference = 5757E6982508D57F00DD3ED0 /* SwiftPhone.app */;
@@ -598,7 +598,7 @@
 			mainGroup = 5757E68F2508D57F00DD3ED0;
 			packageReferences = (
 				C218F46F2D0C64C6000FCA01 /* XCRemoteSwiftPackageReference "SwiftPackage-sipisprovider" */,
-				C2BF95E82EF47B9E00307AD4 /* XCRemoteSwiftPackageReference "SoftphoneSwiftPackage-saas-video" */,
+				C20241442FA9E4880020617A /* XCRemoteSwiftPackageReference "SoftphoneSwiftPackage-saas-video" */,
 			);
 			productRefGroup = 5757E6992508D57F00DD3ED0 /* Products */;
 			projectDirPath = "";
@@ -1085,6 +1085,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		C20241442FA9E4880020617A /* XCRemoteSwiftPackageReference "SoftphoneSwiftPackage-saas-video" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Acrobits-Dev/SoftphoneSwiftPackage-saas-video";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 25.3.13;
+			};
+		};
 		C218F46F2D0C64C6000FCA01 /* XCRemoteSwiftPackageReference "SwiftPackage-sipisprovider" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/acrobits/SwiftPackage-sipisprovider";
@@ -1093,26 +1101,18 @@
 				minimumVersion = 1.0.0;
 			};
 		};
-		C2BF95E82EF47B9E00307AD4 /* XCRemoteSwiftPackageReference "SoftphoneSwiftPackage-saas-video" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/acrobits/SoftphoneSwiftPackage-saas-video";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 25.3.2;
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		C20241452FA9E4880020617A /* SoftphoneSwiftPackage-saas-video */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C20241442FA9E4880020617A /* XCRemoteSwiftPackageReference "SoftphoneSwiftPackage-saas-video" */;
+			productName = "SoftphoneSwiftPackage-saas-video";
+		};
 		C218F4702D0C64C6000FCA01 /* SwiftPackage-sipisprovider */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = C218F46F2D0C64C6000FCA01 /* XCRemoteSwiftPackageReference "SwiftPackage-sipisprovider" */;
 			productName = "SwiftPackage-sipisprovider";
-		};
-		C2BF95E92EF47B9E00307AD4 /* SoftphoneSwiftPackage-saas-video */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = C2BF95E82EF47B9E00307AD4 /* XCRemoteSwiftPackageReference "SoftphoneSwiftPackage-saas-video" */;
-			productName = "SoftphoneSwiftPackage-saas-video";
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

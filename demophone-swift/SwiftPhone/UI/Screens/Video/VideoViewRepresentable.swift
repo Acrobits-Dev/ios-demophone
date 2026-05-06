@@ -31,10 +31,10 @@ struct VideoViewRepresentable: UIViewRepresentable {
     func makeUIView(context: Context) -> VideoView {
         // Assuming VideoView(call:) exists based on your code
         let view = VideoView(call: callEvent)
-        view?.delegate = context.coordinator
-        view?.contentMode = .scaleAspectFit
-        view?.backgroundColor = .black
-        return view ?? VideoView()
+        view.delegate = context.coordinator
+        view.contentMode = .scaleAspectFit
+        view.backgroundColor = .black
+        return view
     }
     
     func updateUIView(_ uiView: VideoView, context: Context) {

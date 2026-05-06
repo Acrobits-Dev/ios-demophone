@@ -56,11 +56,11 @@ class CallService: NSObject {
         var entries: [Entry] = []
         var singleEntries: [Entry] = []
         
-        if let groups = SoftphoneBridge.instance()?.calls()?.conferences()?.list() {
+        if let groups = SoftphoneBridge.instance().calls()?.conferences()?.list() {
             for groupId in groups {
                 entries.append(Entry(groupId: groupId))
                 
-                if let calls = SoftphoneBridge.instance()?.calls()?.conferences()?.getCalls(conference: groupId) {
+                if let calls = SoftphoneBridge.instance().calls()?.conferences()?.getCalls(conference: groupId) {
                     for call in calls {
                         singleEntries.append(Entry(call: call));
                     }
@@ -74,9 +74,9 @@ class CallService: NSObject {
         
         var activeEntry: Entry?
         
-        if let groupId = SoftphoneBridge.instance()?.calls()?.conferences()?.getActive(), !groupId.isEmpty {
+        if let groupId = SoftphoneBridge.instance().calls()?.conferences()?.getActive(), !groupId.isEmpty {
             activeEntry = Entry(groupId: groupId)
-        } else if let calls = SoftphoneBridge.instance()?.calls()?.getActive(), let call = calls.first {
+        } else if let calls = SoftphoneBridge.instance().calls()?.getActive(), let call = calls.first {
             activeEntry = Entry(call: call)
         } else {
             activeEntry = nil
@@ -86,7 +86,7 @@ class CallService: NSObject {
     }
     
     func startCall(number: String, dialAction: String) {
-        if CallRedirectionManager.instance().currentRedirectFlow.isBlindTransfer() {
+        if CallRedirectionManager.instance().currentRedirectFlow!.isBlindTransfer() {
             if number.count == 0 {
                 return
             }
@@ -154,7 +154,7 @@ class CallService: NSObject {
         
         if let entryCall = entry.call {
             call = entryCall
-        } else if let entryCall = SoftphoneBridge.instance()?.calls().conferences().getCalls(conference: entry.groupId).first {
+        } else if let entryCall = SoftphoneBridge.instance().calls()?.conferences()?.getCalls(conference: entry.groupId!).first {
             call = entryCall
         } else {
             dismissAllCallModals()
@@ -162,7 +162,7 @@ class CallService: NSObject {
             return
         }
         
-        if CallRedirectionManager.instance().getRedirectCapabilities(call).canBlindTransfer() {
+        if CallRedirectionManager.instance().getRedirectCapabilities(call)!.canBlindTransfer() {
             CallRedirectionManager.instance().setBlindTransferSource(call)
         } else {
             dismissAllCallModals()
@@ -173,7 +173,7 @@ class CallService: NSObject {
     func getCallFromEntry(entry: Entry) -> SoftphoneCallEvent? {
         if let entryCall = entry.call {
             return entryCall
-        } else if let entryCall = SoftphoneBridge.instance()?.calls().conferences().getCalls(conference: entry.groupId).first {
+        } else if let entryCall = SoftphoneBridge.instance().calls()?.conferences()?.getCalls(conference: entry.groupId!).first {
             return entryCall
         } else {
             return nil
@@ -188,11 +188,11 @@ class CallService: NSObject {
         }
         
         if let capabilities = CallRedirectionManager.instance().getRedirectCapabilities(call) {
-            if capabilities.attendedTransferCapability.isDirect() {
+            if capabilities.attendedTransferCapability!.isDirect() {
                 return .direct
-            } else if capabilities.attendedTransferCapability.isNewCall() {
+            } else if capabilities.attendedTransferCapability!.isNewCall() {
                 return .newCall
-            } else if let _ = capabilities.attendedTransferTargets as? [SoftphoneCallEvent], capabilities.attendedTransferCapability.isPickAnotherCall() {
+            } else if capabilities.attendedTransferCapability!.isPickAnotherCall()  {
                 showConfirmTransferAlert = true
                 return .pickCall
             }
@@ -213,7 +213,7 @@ class CallService: NSObject {
             switch type {
             case .direct:
                 showConfirmTransferAlert = false
-                CallRedirectionManager.instance().performAttendedTransferBetween(source: call, target: capabilities.attendedTransferTargets.first as? SoftphoneCallEvent)
+                CallRedirectionManager.instance().performAttendedTransferBetween(source: call, target: capabilities.attendedTransferTargets.first!)
             case .newCall:
                 showConfirmTransferAlert = false
                 CallRedirectionManager.instance().setAttendedTransferSource(call)
@@ -221,16 +221,15 @@ class CallService: NSObject {
                 showConfirmTransferAlert = true
                 CallRedirectionManager.instance().setAttendedTransferSource(call)
                 
-                if let attendedTransferTargets = capabilities.attendedTransferTargets as? [SoftphoneCallEvent] {
-                    var entries: [Entry] = []
-                    
-                    for target in attendedTransferTargets {
-                        entries.append(.init(call: target))
-                    }
-
-                    attTransferCallEntries = entries
-                    onSingleCallEntriesUpdate.send(entries)
+                let attendedTransferTargets = capabilities.attendedTransferTargets
+                var entries: [Entry] = []
+                
+                for target in attendedTransferTargets {
+                    entries.append(.init(call: target))
                 }
+                
+                attTransferCallEntries = entries
+                onSingleCallEntriesUpdate.send(entries)
             }
             
             return type
@@ -242,7 +241,7 @@ class CallService: NSObject {
     }
     
     func startAttendedTransferWithSelectedCall(entry: Entry) {
-        CallRedirectionManager.instance().setAttendedTransferTarget(entry.call)
+        CallRedirectionManager.instance().setAttendedTransferTarget(entry.call!)
         //CallRedirectionManager.instance().performAttendedTransfer()
     }
     
@@ -276,7 +275,7 @@ class CallService: NSObject {
     
     func split(_ entry: Entry) {
         if entry.isGroup() {
-            if SoftphoneBridge.instance().calls().conferences().getSize(entry.groupId) == 1 {
+            if SoftphoneBridge.instance().calls()?.conferences()?.getSize(entry.groupId!) == 1 {
                 dismissAllCallModals()
                 onError.send("The call is already alone in its group")
             } else {
@@ -284,13 +283,13 @@ class CallService: NSObject {
                 AppDelegate.theApp().splitGroup(groupId: entry.groupId!)
             }
         } else {
-            guard let groupId = SoftphoneBridge.instance()?.calls()?.conferences()?.get(entry.call) else {
+            guard let groupId = SoftphoneBridge.instance().calls()?.conferences()?.get(entry.call!) else {
                 dismissAllCallModals()
                 onError.send("Could not split calls")
                 return
             }
             
-            if (SoftphoneBridge.instance()?.calls()?.conferences()?.getSize(groupId))! > 0 {
+            if (SoftphoneBridge.instance().calls()?.conferences()?.getSize(groupId))! > 0 {
                 dismissAllCallModals()
                 AppDelegate.theApp().splitCall(call: entry.call!)
             }
@@ -303,8 +302,8 @@ class CallService: NSObject {
     
     func answer(_ entry: Entry) {
         if entry.isGroup() {
-            if let call = SoftphoneBridge.instance()?.calls()?.conferences().getCalls(conference: entry.groupId).first {
-                let callState = SoftphoneBridge.instance()?.calls()?.getState(call)
+            if let call = SoftphoneBridge.instance().calls()?.conferences()?.getCalls(conference: entry.groupId!).first {
+                let callState = SoftphoneBridge.instance().calls()?.getState(call)
                 
                 if callState == CallState_IncomingRinging || callState == CallState_IncomingIgnored {
                     dismissAllCallModals()
@@ -315,7 +314,7 @@ class CallService: NSObject {
             }
         }
         else {
-            let callState = SoftphoneBridge.instance()?.calls()?.getState(entry.call)
+            let callState = SoftphoneBridge.instance().calls()?.getState(entry.call!)
             
             if callState == CallState_IncomingRinging || callState == CallState_IncomingIgnored {
                 dismissAllCallModals()
@@ -326,8 +325,8 @@ class CallService: NSObject {
     
     func reject(_ entry: Entry) {
         if entry.isGroup() {
-            if let call = SoftphoneBridge.instance()?.calls()?.conferences().getCalls(conference: entry.groupId).first {
-                let callState = SoftphoneBridge.instance()?.calls()?.getState(call)
+            if let call = SoftphoneBridge.instance().calls()?.conferences()?.getCalls(conference: entry.groupId!).first {
+                let callState = SoftphoneBridge.instance().calls()?.getState(call)
                 
                 if callState == CallState_IncomingRinging || callState == CallState_IncomingIgnored {
                     dismissAllCallModals()
@@ -338,7 +337,7 @@ class CallService: NSObject {
             }
         }
         else {
-            let callState = SoftphoneBridge.instance()?.calls()?.getState(entry.call)
+            let callState = SoftphoneBridge.instance().calls()?.getState(entry.call!)
             
             if callState == CallState_IncomingRinging || callState == CallState_IncomingIgnored {
                 AppDelegate.theApp().rejectIncomingCall(call: entry.call!)
@@ -355,10 +354,10 @@ class CallService: NSObject {
     }
     
     private func groupNotContaining(call: SoftphoneCallEvent) -> String {
-        let groupId = SoftphoneBridge.instance()?.calls()?.conferences()?.get(call)
-        if let allGroups = SoftphoneBridge.instance()?.calls()?.conferences()?.list() {
+        let groupId = SoftphoneBridge.instance().calls()?.conferences()?.get(call)
+        if let allGroups = SoftphoneBridge.instance().calls()?.conferences()?.list() {
             for otherGroup in allGroups {
-                let otherGroupSize = SoftphoneBridge.instance()?.calls()?.conferences()?.getSize(otherGroup)
+                let otherGroupSize = SoftphoneBridge.instance().calls()?.conferences()?.getSize(otherGroup)
                 
                 if otherGroup == groupId || otherGroupSize == 0 {
                     continue
@@ -373,12 +372,12 @@ class CallService: NSObject {
 
 extension CallService: CallRedirectionTargetChangeDelegate {
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-    func redirectTargetChanged(data: TargetChangeData!)
+    func redirectTargetChanged(data: TargetChangeData)
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
         guard let _ = data.newTarget else { return }
         
-        if data.type.isAttendedTransfer() && showConfirmTransferAlert {
+        if data.type!.isAttendedTransfer() && showConfirmTransferAlert {
             onConfirmAttendedTransfer.send(())
         }
     }
@@ -387,22 +386,22 @@ extension CallService: CallRedirectionTargetChangeDelegate {
 extension CallService: CallRedirectionStateChangeDelegate {
     
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-    func redirectStateChanged(data: StateChangeData!)
+    func redirectStateChanged(data: StateChangeData)
     //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
-        let isTransferType = data.type.isTransferType()
+        let isTransferType = data.type!.isTransferType()
         var message: String = ""
         
-        if data.newState.isSucceeded() {
+        if data.newState!.isSucceeded() {
             message = isTransferType ? "Transfer Complete" : "Forward Complete"
         }
-        else if data.newState.isFailed() {
+        else if data.newState!.isFailed() {
             message = isTransferType ? "Transfer Failed" : "Forward Failed"
         }
-        else if data.newState.isCancelled() {
+        else if data.newState!.isCancelled() {
             message = isTransferType ? "Transfer Cancelled" : "Forward Cancelled"
         }
-        else if data.newState.isInProgress() {
+        else if data.newState!.isInProgress() {
             message = isTransferType ? "Transfer in Progress" : "Forward in Progress"
         }
     }

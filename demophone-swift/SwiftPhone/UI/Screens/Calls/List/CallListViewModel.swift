@@ -79,11 +79,11 @@ class CallListViewModel: ObservableObject {
         
         for entry in entries {
             if entry.isGroup() {
-                let active = SoftphoneBridge.instance()?.calls()?.conferences()?.getActive() == entry.groupId // checking if the conference is OnHold or not
+                let active = SoftphoneBridge.instance().calls()?.conferences()?.getActive() == entry.groupId // checking if the conference is OnHold or not
                 
-                let calls = SoftphoneBridge.instance()?.calls()?.conferences()?.getCalls(conference: entry.groupId)
+                let calls = SoftphoneBridge.instance().calls()?.conferences()?.getCalls(conference: entry.groupId!)
 
-                let size = SoftphoneBridge.instance()?.calls()?.conferences()?.getSize(entry.groupId)
+                let size = SoftphoneBridge.instance().calls()?.conferences()?.getSize(entry.groupId!)
                 
                 guard let size = size else {
                     continue
@@ -95,12 +95,14 @@ class CallListViewModel: ObservableObject {
                 let canBeAnswered = canBeAnswered(call: calls?.first)
                 
                 if let call = calls?.first, size == 1 {
-                    title = "Call: \(call.getRemoteUser(index: 0).displayName ?? "")"
+                    title = "Call: \(call.getRemoteUser(index: 0)?.displayName ?? "")"
                     incoming = isIncomingState(call: call)
-                    status = CallState.toString(SoftphoneBridge.instance().calls().getState(call))
+                    let s = SoftphoneBridge.instance().calls()?.getState(call)
+                    status = CallState.toString(s!)
                 } else if let call = calls?.first, size > 1 {
                     title = "Group call: \(size) Participants"
-                    status = CallState.toString(SoftphoneBridge.instance().calls().getState(call))
+                    let s = SoftphoneBridge.instance().calls()?.getState(call)
+                    status = CallState.toString(s!)
                 } else {
                     title = "Call"
                     status = "Active"
@@ -117,12 +119,12 @@ class CallListViewModel: ObservableObject {
                 items.append(item)
             } else {
                 var isOnHold = false
-                if let holdStates = SoftphoneBridge.instance().calls().isHeld(entry.call) {
+                if let holdStates = SoftphoneBridge.instance().calls()?.isHeld(entry.call!) {
                     isOnHold = holdStates.local == CallHoldState_Held
                 }
 
                 let title = "Call: \(entry.call?.getRemoteUser(index: 0)?.displayName! ?? "")"
-                let status = CallState.toString((SoftphoneBridge.instance()?.calls()?.getState(entry.call))!) ?? "Active"
+                let status = CallState.toString((SoftphoneBridge.instance().calls()?.getState(entry.call!))!)
                 
                 let item = ActiveCallItem(account: title,
                                           status: status,
@@ -144,7 +146,7 @@ class CallListViewModel: ObservableObject {
             return false
         }
         
-        guard let state = SoftphoneBridge.instance()?.calls()?.getState(call) else {
+        guard let state = SoftphoneBridge.instance().calls()?.getState(call) else {
             return false
         }
         
@@ -165,7 +167,7 @@ class CallListViewModel: ObservableObject {
             return false
         }
         
-        guard let callState = SoftphoneBridge.instance()?.calls()?.getState(call) else {
+        guard let callState = SoftphoneBridge.instance().calls()?.getState(call) else {
             return false
         }
         

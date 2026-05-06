@@ -53,7 +53,7 @@ extension TargetPickerViewController: UITableViewDelegate, UITableViewDataSource
         cell.detailTextLabel?.backgroundColor = .clear
         
         let call = attendedTransferTargets[indexPath.row]
-        cell.textLabel?.text = call.getRemoteUser(index: 0).displayName
+        cell.textLabel?.text = call.getRemoteUser(index: 0)?.displayName ?? ""
         cell.detailTextLabel?.text = ""
         
         return cell

@@ -143,7 +143,7 @@ class CallDetailViewModel: ObservableObject {
         let call: SoftphoneCallEvent?
         
         if callItem.entry.isGroup() {
-            call = SoftphoneBridge.instance()?.calls()?.conferences()?.getCalls(conference: callItem.entry.groupId).first
+            call = SoftphoneBridge.instance().calls()?.conferences()?.getCalls(conference: callItem.entry.groupId!).first
         } else {
             call = callItem.entry.call
         }
@@ -293,7 +293,7 @@ class CallDetailViewModel: ObservableObject {
                     if let selectedCall = self.callItem.entry.call {
                         return selectedCall != entry.call
                     } else if let entryCall = entry.call {
-                        let groupOfCall = SoftphoneBridge.instance()?.calls().conferences().get(entryCall)
+                        let groupOfCall = SoftphoneBridge.instance().calls()?.conferences()?.get(entryCall)
                         return groupOfCall != self.callItem.entry.groupId
                     } else {
                         return true
@@ -352,17 +352,13 @@ class CallDetailViewModel: ObservableObject {
             return
         }
         
-        if let established = call.timeEstablishedDate {
-            let seconds = max(0, Date().timeIntervalSince(established))
-            durationText = Self.durationFormatter.string(from: seconds)
-            return
-        }
-        
         if call.duration > 0 {
             durationText = Self.durationFormatter.string(from: call.duration)
             return
         }
         
-        durationText = nil
+        let established = call.timeEstablishedDate
+        let seconds = max(0, Date().timeIntervalSince(established))
+        durationText = Self.durationFormatter.string(from: seconds)
     }
 }
