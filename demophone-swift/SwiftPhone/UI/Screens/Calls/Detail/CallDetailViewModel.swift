@@ -357,8 +357,9 @@ class CallDetailViewModel: ObservableObject {
             return
         }
         
-        let established = call.timeEstablishedDate
-        let seconds = max(0, Date().timeIntervalSince(established))
-        durationText = Self.durationFormatter.string(from: seconds)
+        if let established = call.timeEstablishedDate {
+            let seconds = max(0, Date().timeIntervalSince(established))
+            durationText = Self.durationFormatter.string(from: seconds)
+        }
     }
 }
