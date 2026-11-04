@@ -20,9 +20,7 @@
  
  */
 
-// ******************************************************************
 class SoftphoneObserverProxy : public Softphone::Observer
-// ******************************************************************
 {
 public:
 	SoftphoneObserverProxy(NSObject<SoftphoneDelegate> * delegate);

@@ -115,7 +115,7 @@ public class DemoAppPushProvider: NEAppPushProvider {
             
             _sipis?.start(withSettings: strSettings, basePath: basePath, key: key, completionHandler: { (error: Error?) -> Void in
                 postDataArray.forEach({ postData in
-                    self._sipis?.registerAccount(withPostData: postData, encrypted: key?.count ?? 0 > 0)
+                    self._sipis?.registerAccount(withPostData: postData, encrypted: key?.count ?? 0 > 0, activate: true)
                 })
                 NSLog("DemoAppPushProvider: starting local sipis finished");
                 completionHandler(error)

@@ -30,13 +30,11 @@
  VideoViewController uses directly @ref Softphone::InstanceVideo API to get the video image, set the cameras etc.
  */
 
-// ******************************************************************
 @interface VideoViewController : UIViewController <UITextFieldDelegate
 #ifdef SOFTPHONE_VIDEO
                                                     ,SoftphoneVideoViewDelegate
 #endif
 >
-// ******************************************************************
 
 #ifdef SOFTPHONE_VIDEO
 

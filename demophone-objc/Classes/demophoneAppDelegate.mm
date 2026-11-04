@@ -41,13 +41,9 @@ typedef NS_ENUM(NSInteger, LicensingManagementErrorCode) {
     LicenseInvalid,
 };
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 using ali::operator""_s;
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 enum ImagePurpose
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     Payload,
     NetworkPreview,
@@ -55,14 +51,8 @@ enum ImagePurpose
     TemporaryLocalPreview
 };
 
-//************************************************************
-//************************************************************
-//************************************************************
 
 
-//************************************************************
-//************************************************************
-//************************************************************
 @interface demophoneAppDelegate ()
 {
     ali::handle2_disposer _disposer;
@@ -101,9 +91,7 @@ ali::string_literal sip_account{"<account id=\"sip\">"
 #endif
 					"</account>"};
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 - (void)applicationDidFinishLaunching:(UIApplication *)application
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     self.missedCallNotificationQueue = dispatch_queue_create("missed.call.notification.queue", DISPATCH_QUEUE_SERIAL);
     self.pendingWorkItems = [NSMutableDictionary dictionary];
@@ -112,16 +100,6 @@ ali::string_literal sip_account{"<account id=\"sip\">"
     _stateChangeDelegates = [NSHashTable weakObjectsHashTable];
     _sourceChangeDelegates = [NSHashTable weakObjectsHashTable];
     _targetChangeDelegates = [NSHashTable weakObjectsHashTable];
-    
-    self.tabcon = (UITabBarController *)self.window.rootViewController;
-    self.regViewController = [self.tabcon.viewControllers objectAtIndex:0];
-    self.callViewController = [self.tabcon.viewControllers objectAtIndex:1];
-    
-#ifdef SOFTPHONE_VIDEO
-    self.videoViewController = [self.tabcon.viewControllers objectAtIndex:2];
-#else
-    self.tabcon.viewControllers = @[self.regViewController, self.callViewController];
-#endif
     
     NSString *filePath = [[NSBundle mainBundle] pathForResource:@"provisioning" ofType:@"xml"];
     
@@ -217,9 +195,44 @@ ali::string_literal sip_account{"<account id=\"sip\">"
     }
 }
 
-//*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+// Scene UI is connected after the process-wide SDK has been initialized.
+- (void)connectWindow:(UIWindow *)window
+{
+    self.window = window;
+    self.tabcon = (UITabBarController *)self.window.rootViewController;
+    self.regViewController = [self.tabcon.viewControllers objectAtIndex:0];
+    self.callViewController = [self.tabcon.viewControllers objectAtIndex:1];
+
+#ifdef SOFTPHONE_VIDEO
+    self.videoViewController = [self.tabcon.viewControllers objectAtIndex:2];
+#else
+    self.tabcon.viewControllers = @[self.regViewController, self.callViewController];
+#endif
+
+    if (_softphone != nullptr)
+    {
+        [self.regViewController loadViewIfNeeded];
+        self.regViewController.regState.text = [NSString stringFromRegState:
+            _softphone->registration()->getRegistrationState("sip"_s)];
+        [self refreshCallViews];
+    }
+}
+
+- (void)disconnectWindow:(UIWindow *)window
+{
+    if (self.window != window)
+        return;
+
+    self.window = nil;
+    self.tabcon = nil;
+    self.regViewController = nil;
+    self.callViewController = nil;
+#ifdef SOFTPHONE_VIDEO
+    self.videoViewController = nil;
+#endif
+}
+
 -(void)updateBadge
-//*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 {
     auto badgeManager = Softphone::SdkServiceLocator::getBadgeManager();
     auto count = badgeManager->countForChannelSafe(Softphone::BadgeAddress::Calls);
@@ -227,9 +240,7 @@ ali::string_literal sip_account{"<account id=\"sip\">"
     NSLog(@"Missed Call Count = %d", missedCallCount);
 }
 
-//*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 -(BOOL)initialize:(NSString *)license error:(NSError **) error
-//*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 {
     int errorIndex = 0;
     bool success;
@@ -260,9 +271,7 @@ ali::string_literal sip_account{"<account id=\"sip\">"
     return NO;
 }
 
-//*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 -(BOOL) isRegistrationInactive
-//*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 {
     Registrator::State::Type curState =
 		_softphone->registration()->getRegistrationState("sip"_s);
@@ -277,23 +286,17 @@ ali::string_literal sip_account{"<account id=\"sip\">"
 	}
 }
 
-//*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 - (void) applicationWillTerminate:(UIApplication *)application
-//*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 {
     
 }
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 + (demophoneAppDelegate *) theApp
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
 	return (demophoneAppDelegate*)[[UIApplication sharedApplication] delegate];
 }
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 -(void) refreshCallViews
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     [self.callViewController refresh];
 
@@ -302,37 +305,7 @@ ali::string_literal sip_account{"<account id=\"sip\">"
 #endif
 }
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-- (void) applicationWillResignActive:(UIApplication *)application
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-{
-    
-}
-
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-- (void) applicationDidBecomeActive:(UIApplication *)application
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-{
-    
-}
-
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-- (void) applicationDidEnterBackground:(UIApplication *)application
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-{
-    
-}
-
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-- (void)applicationWillEnterForeground:(UIApplication *)application
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-{
-    
-}
-
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 -(void) closeTerminalCalls
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     ali::array_set<Softphone::EventHistory::CallEvent::Pointer> callsToDelete;
     
@@ -359,9 +332,7 @@ ali::string_literal sip_account{"<account id=\"sip\">"
     }
 }
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 - (BOOL) callNumber:(NSString *) number
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     if([number length] == 0)
         return NO;
@@ -385,9 +356,7 @@ ali::string_literal sip_account{"<account id=\"sip\">"
     return NO;
 }
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 - (BOOL) callNumber:(NSString *)number dialAction:(NSString *)dialAction
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     if([number length] == 0)
         return NO;
@@ -405,9 +374,7 @@ ali::string_literal sip_account{"<account id=\"sip\">"
     return result ==  Softphone::Instance::Events::PostResult::Success;
 }
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 -(void)startSimulatedMicrophone
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     _softphone->calls()->startSimulatedMicrophone(nullptr, true);
     NSBundle *bundle = [NSBundle mainBundle];
@@ -416,16 +383,12 @@ ali::string_literal sip_account{"<account id=\"sip\">"
     _softphone->calls()->startSimulatedMicrophone(ali::filesystem2::path(ali::mac::str::from_nsstring(resourcePath)) / "eliseb.wav"_s, false);
 }
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 -(void)stopSimulatedMicrophone
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     _softphone->calls()->stopSimulatedMicrophone();
 }
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 - (void) toggleMute
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     bool const newMute = !_softphone->audio()->isMuted();
     
@@ -434,9 +397,7 @@ ali::string_literal sip_account{"<account id=\"sip\">"
     [self refreshCallViews];
 }
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 - (void) toggleSpeaker
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     bool const newSpeaker = _softphone->audio()->getCallAudioRoute() != Softphone::AudioRoute::Speaker;
     
@@ -444,9 +405,7 @@ ali::string_literal sip_account{"<account id=\"sip\">"
     [self refreshCallViews];
 }
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 - (void) unregisterAccount
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     _sipAccount.nodes["icm"_s].data = "off"_s;
     
@@ -456,9 +415,7 @@ ali::string_literal sip_account{"<account id=\"sip\">"
     _softphone->registration()->updateAll();
 }
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 - (void) registerAccount
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     _sipAccount.nodes["icm"_s].data = "push"_s;
 
@@ -466,9 +423,7 @@ ali::string_literal sip_account{"<account id=\"sip\">"
     _softphone->registration()->updateAll();
 }
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 - (void) toggleActiveGroup:(ali::string const&) groupId
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     auto activeGroup = _softphone->calls()->conferences()->getActive();
     
@@ -480,9 +435,7 @@ ali::string_literal sip_account{"<account id=\"sip\">"
         _softphone->calls()->conferences()->setActive(groupId);
 }
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 - (void) putActiveCallOnHold
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     ali::opt_string activeGroupId = _softphone->calls()->conferences()->getActive();
     if(activeGroupId.is_null())
@@ -497,9 +450,7 @@ ali::string_literal sip_account{"<account id=\"sip\">"
     }
 }
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 - (void) toggleHoldForCall:(Softphone::EventHistory::CallEvent::Pointer) call
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
 	bool const newHeld = _softphone->calls()->isHeld(call).local != Call::HoldState::Held;
     
@@ -525,9 +476,7 @@ ali::string_literal sip_account{"<account id=\"sip\">"
     }
 }
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 - (void) answerIncomingCall:(Softphone::EventHistory::CallEvent::Pointer) call
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     Call::State::Type cs = _softphone->calls()->getState(call);
 
@@ -537,9 +486,7 @@ ali::string_literal sip_account{"<account id=\"sip\">"
 	_softphone->calls()->answerIncoming(call,self.currentDesiredMedia);
 }
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 - (void) rejectIncomingCall:(Softphone::EventHistory::CallEvent::Pointer) call
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     Call::State::Type cs = _softphone->calls()->getState(call);
     
@@ -550,16 +497,12 @@ ali::string_literal sip_account{"<account id=\"sip\">"
 	_softphone->calls()->close(call);
 }
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 - (void) hangupCall:(Softphone::EventHistory::CallEvent::Pointer) callEvent
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
 	_softphone->calls()->close(callEvent);
 }
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 - (void) hangupGroup:(ali::string const&)groupId
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     ali::array_set<Softphone::EventHistory::CallEvent::Pointer> calls
         = _softphone->calls()->conferences()->getCalls(groupId);
@@ -570,30 +513,22 @@ ali::string_literal sip_account{"<account id=\"sip\">"
     }
 }
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 -(Call::Statistics) getStatisticsForCall:(Softphone::EventHistory::CallEvent::Pointer) call
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     return _softphone->calls()->getStatistics(call);
 }
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 - (void) dtmfOnForKey:(char) key
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
 	_softphone->audio()->dtmfOn(key);
 }
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 - (void) dtmfOff
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
 	_softphone->audio()->dtmfOff();	
 }
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 - (void) dumpLog
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
 	ali::string log = _softphone->log()->get();
 	_softphone->log()->clear();
@@ -603,9 +538,7 @@ ali::string_literal sip_account{"<account id=\"sip\">"
 	printf("========================================================\n");
 }
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 -(void) sendExampleSMSTo:(NSString *) recipient
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     if([recipient length] == 0)
         return;
@@ -629,31 +562,23 @@ ali::string_literal sip_account{"<account id=\"sip\">"
     }
 }
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 -(Softphone::Instance *) softphone
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
 	return _softphone;
 }
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 - (void) joinCall:(Softphone::EventHistory::CallEvent::Pointer) call toGroup:(const ali::string &)group
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     _softphone->calls()->conferences()->move(call,group);
 }
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 - (void) splitCall:(Softphone::EventHistory::CallEvent::Pointer) call
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     ali::string groupId = _softphone->calls()->conferences()->get(call);
     _softphone->calls()->conferences()->split(call, true);
 }
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 - (void) splitGroup:(ali::string const&) groupId
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     ali::array_set<Softphone::EventHistory::CallEvent::Pointer> calls =
         _softphone->calls()->conferences()->getCalls(groupId);
@@ -664,9 +589,7 @@ ali::string_literal sip_account{"<account id=\"sip\">"
     }
 }
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 - (void) transferCall:(Softphone::EventHistory::CallEvent::Pointer) callEvent
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
 	if([self.regViewController.number.text length] == 0)
 	{
@@ -682,24 +605,18 @@ ali::string_literal sip_account{"<account id=\"sip\">"
     callRedirectionManager->performBlindTransferToTarget(newCall);
 }
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 - (void) attendedTransferFromCall:(Softphone::EventHistory::CallEvent::Pointer) call
                                to:(Softphone::EventHistory::CallEvent::Pointer) otherCall
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
 	_softphone->calls()->conferences()->attendedTransfer(call,otherCall);
 }
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 -(Call::DesiredMedia) currentDesiredMedia
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     return Call::DesiredMedia::voiceOnly();
 }
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 -(void) adjustCxCallUpdate: (CXCallUpdate*) callUpdate forCall: (Softphone::EventHistory::CallEvent::Pointer) call
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     /* a way to reject the call prior to callkit incoming call jumps in
      *
@@ -715,9 +632,7 @@ ali::string_literal sip_account{"<account id=\"sip\">"
      */
 }
 
-//*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 -(void) registerForPushNotifications
-//*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 {
     Softphone::Preferences const& preferences = _softphone->settings()->getPreferences();
 
@@ -735,9 +650,7 @@ ali::string_literal sip_account{"<account id=\"sip\">"
     }
 }
 
-//*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 - (void)pushRegistry:(PKPushRegistry *)registry didUpdatePushCredentials:(PKPushCredentials *)credentials forType:(NSString *)type
-//*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     ali::string_const_ref token(static_cast<const char*>(credentials.token.bytes), static_cast<int>(credentials.token.length));
     NSLog(@"Got push credentials for %@\n", credentials.type);
@@ -747,9 +660,7 @@ ali::string_literal sip_account{"<account id=\"sip\">"
     _softphone->notifications()->push()->setRegistrationId(token, usage);
 }
 
-//*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 - (void)pushRegistry:(PKPushRegistry *)registry didReceiveIncomingPushWithPayload:(PKPushPayload *)payload forType:(NSString *)type
-//*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     NSLog(@"Got voip push");
     ali::auto_ptr<ali::xml::tree> xml = [NSDictionary XMLFromDictionary: payload.dictionaryPayload];
@@ -757,9 +668,7 @@ ali::string_literal sip_account{"<account id=\"sip\">"
 }
 
 
-//*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 - (void) application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)dev
-//*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 {
     
     ali::string_const_ref token(static_cast<const char*>(dev.bytes), static_cast<int>(dev.length));
@@ -770,9 +679,7 @@ ali::string_literal sip_account{"<account id=\"sip\">"
     _softphone->notifications()->push()->setRegistrationId(token, usage);
 }
 
-//*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 - (void) application:(UIApplication *)application didFailToRegisterForRemoteNotificationsWithError:(NSError *)error
-//*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 {
     NSLog(@"Did fail to get remote-notification token\n");
     auto const usage = _softphone->settings()->getPreferences().dualPushes.get() ? Softphone::PushToken::Usage::Other : Softphone::PushToken::Usage::All;
@@ -780,9 +687,7 @@ ali::string_literal sip_account{"<account id=\"sip\">"
     _softphone->notifications()->push()->setRegistrationId({}, usage);
 }
 
-//*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(nonnull NSDictionary *)userInfo fetchCompletionHandler:(nonnull void (^)(UIBackgroundFetchResult))completionHandler
-//*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 {
     NSLog(@"Got remote-notification push");
     ali::auto_ptr<ali::xml::tree> xml = [NSDictionary XMLFromDictionary: userInfo];
@@ -815,9 +720,7 @@ ali::string_literal sip_account{"<account id=\"sip\">"
 }
 
 #pragma mark - Send Message With Attachment
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 -(void)sendExampleSMSWithAttachmentTo:(NSString *)recipient
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     UIImage *attachmentSource = [UIImage imageNamed:@"MessageAttachment"];
     
@@ -836,9 +739,7 @@ ali::string_literal sip_account{"<account id=\"sip\">"
     }
 }
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 - (Softphone::Instance::Events::PostResult::Type)sendMessage:(NSString *)message withAttachment:(Softphone::EventHistory::EventAttachment *)attachment toRecipient:(NSString *)number
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     if(number.length == 0)
         return Softphone::Instance::Events::PostResult::Type::NoRecipient;
@@ -866,9 +767,7 @@ ali::string_literal sip_account{"<account id=\"sip\">"
     return Softphone::instance()->events()->post(messageEvent);
 }
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 - (NSString *)getUniqueId
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     NSDate *date = [NSDate date];
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
@@ -876,9 +775,7 @@ ali::string_literal sip_account{"<account id=\"sip\">"
     return [dateFormatter stringFromDate:date];
 }
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 - (void)storeImage:(UIImage*)source forAttachment:(Softphone::EventHistory::EventAttachment &)attachment purpose:(ImagePurpose)purpose
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     NSData *data = nil;
     ali::string fileId = "att_"_s + ali::mac::str::from_nsstring([self getUniqueId]);
@@ -943,22 +840,18 @@ ali::string_literal sip_account{"<account id=\"sip\">"
 }
 
 #pragma mark - UNUserNotificationCenterDelegate
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 - (void)userNotificationCenter:(UNUserNotificationCenter *)center willPresentNotification:(UNNotification *)notification withCompletionHandler:(void (^)(UNNotificationPresentationOptions options))completionHandler
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     completionHandler(UNNotificationPresentationOptionList | UNNotificationPresentationOptionBanner | UNNotificationPresentationOptionSound);
 }
 
 #pragma mark - Notification
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 /// The reason behind adding a delay is to fix the glich of missed call notification shown twice.
 /// First time from the local notification and second time from the remote notification.
 /// Adding a delay allows the remote notification to be processed first, and if it is not present,
 /// the local notification is shown.
 - (void)scheduleMissedCallNotification:(Softphone::EventHistory::CallEvent::Pointer)call delay:(NSTimeInterval)delay
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     Softphone::EventHistory::RemoteUser &remoteUser = call->getRemoteUser();
     NSString *threadId = ali::mac::str::to_nsstring(remoteUser.getTransportUri().username_from_uri());
@@ -1032,9 +925,7 @@ ali::string_literal sip_account{"<account id=\"sip\">"
 }
 
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 - (NSString *)getSha1PushId:(Softphone::EventHistory::CallEvent::Pointer)callEvent
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     NSString *pushId = @"";
 
@@ -1050,9 +941,7 @@ ali::string_literal sip_account{"<account id=\"sip\">"
     return [[self sha1WithString:pushId] lowercaseString];
 }
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 - (NSString *)sha1WithString:(NSString *)string
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     NSData *data = [string dataUsingEncoding:NSUTF8StringEncoding];
 
@@ -1068,100 +957,76 @@ ali::string_literal sip_account{"<account id=\"sip\">"
 }
 
 #pragma mark - SoftphoneDelegate
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 -(void) softphoneRegistrationStateChanged:(Registrator::State::Type) state
 #if defined(SOFTPHONE_MULTIPLE_ACCOUNTS)
                                forAccount:(const ali::string &)accountId
 #endif
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     self.regViewController.regState.text = [NSString stringFromRegState:state];
 }
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 -(void) softphoneCall:(Softphone::EventHistory::CallEvent::Pointer) call changedState:(Call::State::Type) state
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     [self refreshCallViews];
     [self closeTerminalCalls];
 }
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 -(void) softphoneCallRepositoryChanged
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     [self refreshCallViews];
 }
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 -(void) softphoneCall:(Softphone::EventHistory::CallEvent::Pointer) call
    mediaStatusChanged:(Call::MediaStatus const&) media;
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     [self refreshCallViews];
 }
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 -(void) softphoneCall:(Softphone::EventHistory::CallEvent::Pointer) call changedHoldStates:(Call::HoldStates const& ) holdStates
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     [self refreshCallViews];
 }
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 -(void) onSimulatedMicrophoneStopped
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     NSLog(@"Simulated microphone STOPPED\n");
 }
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 -(void) microphone:(Softphone::Microphone::Type) microphone muted:(BOOL) muted
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     NSLog(@"microphone %s changed to: %@\n",Softphone::Microphone::toString(microphone).data(),
           muted?@"MUTED":@"NOT MUTED");
 }
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 -(void) softphoneTransferOffered:(Softphone::EventHistory::CallEvent::Pointer) call
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     // we accept all transfers automatically
     _softphone->calls()->conferences()->acceptOfferedTransfer(call,self.currentDesiredMedia);
 }
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 -(void) softphoneTransferResultForCall:(Softphone::EventHistory::CallEvent::Pointer) call
                                success:(bool)success
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     
 }
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 -(void) softphoneHasChangedEvents:(Softphone::EventHistory::ChangedEvents) events
                           streams:(Softphone::EventHistory::ChangedStreams) streams
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     [self refreshCallViews];
 }
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 -(void) voicemailAvailable:(Voicemail::Record const&)voicemail
 
 #if defined(SOFTPHONE_MULTIPLE_ACCOUNTS)
                 forAccount:(const ali::string &)accountId
 #endif
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     printf("%d new voicemail messages\n",voicemail.getNewMessages());
 }
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 -(void) softphoneHasIncomingEvent:(Softphone::EventHistory::Event::Pointer) incomingEvent
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     if(incomingEvent->isCall())
     {
@@ -1203,16 +1068,12 @@ ali::string_literal sip_account{"<account id=\"sip\">"
     }
 }
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 - (void) softphoneAudioRouteChanged:(Softphone::AudioRoute::Type)route
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     [self refreshCallViews];
 }
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 -(void) onMissedCalls:(const ali::array<Softphone::EventHistory::CallEvent::Pointer>) calls
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     // Here you can iterate through the calls and schedule notification for each call.
     for (auto call : calls) {
@@ -1222,9 +1083,7 @@ ali::string_literal sip_account{"<account id=\"sip\">"
 
 #pragma mark - Badge Manager
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 -(void)setupBadgeCountChange
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     auto weakSelf = ali::mac::make_weak(self);
     
@@ -1237,9 +1096,7 @@ ali::string_literal sip_account{"<account id=\"sip\">"
 
 #pragma mark - Call Redirection Manager
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 - (void)setupCallRedirectionProxies
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     auto weakSelf = ali::mac::make_weak(self);
     
@@ -1260,51 +1117,37 @@ ali::string_literal sip_account{"<account id=\"sip\">"
     }));
 }
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 -(void)addStateChangeDelegate:(id<CallRedirectionStateChangeDelegate>)delegate
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     [_stateChangeDelegates addObject:delegate];
 }
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 -(void)addSourceChangeDelegate:(id<CallRedirectionSourceChangeDelegate>)delegate
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     [_sourceChangeDelegates addObject:delegate];
 }
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 -(void)addTargetChangeDelegate:(id<CallRedirectionTargetChangeDelegate>)delegate
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     [_targetChangeDelegates addObject:delegate];
 }
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 -(void)removeStateChangeDelegate:(id<CallRedirectionStateChangeDelegate>)delegate;
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     [_stateChangeDelegates removeObject:delegate];
 }
 
-//*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 -(void)removeSourceChangeDelegate:(id<CallRedirectionSourceChangeDelegate>)delegate
-//*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 {
     [_sourceChangeDelegates removeObject:delegate];
 }
 
-//*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 -(void)removeTargetChangeDelegate:(id<CallRedirectionTargetChangeDelegate>)delegate
-//*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 {
     [_targetChangeDelegates removeObject:delegate];
 }
 
-//*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 - (void)onRedirectStateChanged:(Call::Redirection::Callbacks::StateChangeData const&)data
-//*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 {
     for (id<CallRedirectionStateChangeDelegate> delegate in _stateChangeDelegates.allObjects)
     {
@@ -1315,9 +1158,7 @@ ali::string_literal sip_account{"<account id=\"sip\">"
     }
 }
 
-//*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 - (void)onRedirectSourceChanged:(Call::Redirection::Callbacks::SourceChangeData const&) data
-//*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 {
     for (id<CallRedirectionSourceChangeDelegate> delegate in _sourceChangeDelegates.allObjects)
     {
@@ -1328,9 +1169,7 @@ ali::string_literal sip_account{"<account id=\"sip\">"
     }
 }
 
-//*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 - (void)onRedirectTargetChanged:(Call::Redirection::Callbacks::TargetChangeData const&) data
-//*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 {
     for (id<CallRedirectionTargetChangeDelegate> delegate in _targetChangeDelegates.allObjects)
     {

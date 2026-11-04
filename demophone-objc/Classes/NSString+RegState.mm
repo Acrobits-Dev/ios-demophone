@@ -13,9 +13,7 @@
 
 @implementation NSString(RegState)
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 +(NSString *) stringFromRegState:(Registrator::State::Type) regState
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     return ali::mac::str::to_nsstring(Registrator::State::toString(regState));
 }

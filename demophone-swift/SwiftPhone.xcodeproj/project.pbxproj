@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A20000000000000000000002 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000001 /* SceneDelegate.swift */; };
 		5757E69C2508D57F00DD3ED0 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5757E69B2508D57F00DD3ED0 /* AppDelegate.swift */; };
 		5757E6A52508D58200DD3ED0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5757E6A42508D58200DD3ED0 /* Assets.xcassets */; };
 		5757E6A82508D58200DD3ED0 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5757E6A62508D58200DD3ED0 /* LaunchScreen.storyboard */; };
@@ -116,6 +117,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		A20000000000000000000001 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		5757E6982508D57F00DD3ED0 /* SwiftPhone.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwiftPhone.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5757E69B2508D57F00DD3ED0 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		5757E6A42508D58200DD3ED0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -284,6 +286,7 @@
 				C2A2B2D02542C6C50056B21C /* SwiftPhone.entitlements */,
 				579F6A412510BC430060336A /* Bridge */,
 				5757E69B2508D57F00DD3ED0 /* AppDelegate.swift */,
+				A20000000000000000000001 /* SceneDelegate.swift */,
 				5757E6A42508D58200DD3ED0 /* Assets.xcassets */,
 				5757E6A62508D58200DD3ED0 /* LaunchScreen.storyboard */,
 				5757E6A92508D58200DD3ED0 /* Info.plist */,
@@ -670,6 +673,7 @@
 				F116F9DA2D318675003E3B15 /* UserRegistrationView.swift in Sources */,
 				C2AE94432EE9BB53009613CB /* VideoService.swift in Sources */,
 				5757E69C2508D57F00DD3ED0 /* AppDelegate.swift in Sources */,
+				A20000000000000000000002 /* SceneDelegate.swift in Sources */,
 				C28857162A8E787F00E048F2 /* TargetPickerViewController.swift in Sources */,
 				C2C3BEF12C1AEE190024838A /* NEAppPushManagerConfig.swift in Sources */,
 				F116F9E42D347BA2003E3B15 /* CallListView.swift in Sources */,

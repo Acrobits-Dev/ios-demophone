@@ -1,9 +1,7 @@
 import Foundation
 import NetworkExtension
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 class NEAppPushManagerConfig : Equatable
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     var matchSSIDs: [String]
     var keepAliveInterval: Int
@@ -15,9 +13,7 @@ class NEAppPushManagerConfig : Equatable
     var checksums: [String]
     var postData: [String]
     
-    //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     init()
-    //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
         self.matchSSIDs = []
         self.keepAliveInterval = 0
@@ -30,9 +26,7 @@ class NEAppPushManagerConfig : Equatable
         self.postData = []
     }
     
-    //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     init(manager: NEAppPushManager)
-    //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
         let dict = manager.providerConfiguration
         self.keepAliveInterval = dict["keepAliveInterval"] as? Int ??  0
@@ -46,9 +40,7 @@ class NEAppPushManagerConfig : Equatable
         self.matchSSIDs = manager.matchSSIDs
     }
     
-    //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     static func == (lhs: NEAppPushManagerConfig, rhs: NEAppPushManagerConfig) -> Bool
-    //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
         return lhs.matchSSIDs == rhs.matchSSIDs &&
         lhs.keepAliveInterval == rhs.keepAliveInterval &&

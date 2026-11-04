@@ -7,13 +7,9 @@
 
 #import "UIViewController+Alert.h"
 
-// ******************************************************************
 @implementation UIViewController (Alert)
-// ******************************************************************
 
-// ******************************************************************
 -(void)showAlertWithTitle:(NSString *)title andMessage:(NSString *)message
-// ******************************************************************
 {
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:title
                                                                    message:message

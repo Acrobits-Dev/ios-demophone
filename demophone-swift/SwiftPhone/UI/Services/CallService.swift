@@ -371,9 +371,7 @@ class CallService: NSObject {
 }
 
 extension CallService: CallRedirectionTargetChangeDelegate {
-    //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     func redirectTargetChanged(data: TargetChangeData)
-    //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
         guard let _ = data.newTarget else { return }
         
@@ -385,9 +383,7 @@ extension CallService: CallRedirectionTargetChangeDelegate {
 
 extension CallService: CallRedirectionStateChangeDelegate {
     
-    //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     func redirectStateChanged(data: StateChangeData)
-    //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
         let isTransferType = data.type!.isTransferType()
         var message: String = ""

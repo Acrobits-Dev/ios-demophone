@@ -13,9 +13,7 @@
 
 @implementation NSString(CallState)
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 +(NSString *) stringFromCallState:(Call::State::Type) callState
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     return ali::mac::str::to_nsstring(Call::State::toString(callState));
 }

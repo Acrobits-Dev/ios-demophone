@@ -86,9 +86,7 @@
  
  */
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 @interface demophoneAppDelegate : NSObject <UIApplicationDelegate, SoftphoneDelegate, Softphone_iOS_Delegate, PKPushRegistryDelegate, UNUserNotificationCenterDelegate>
-//*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 {    
 	Softphone::Instance *       _softphone;
 
@@ -194,7 +192,11 @@
 
 -(void)removeTargetChangeDelegate:(id<CallRedirectionTargetChangeDelegate>)delegate;
 
-@property (nonatomic, retain) UIWindow *            window;
+// The scene owns the window; retain a weak reference for existing UI helpers.
+@property (nonatomic, weak) UIWindow *              window;
+
+- (void)connectWindow:(UIWindow *)window;
+- (void)disconnectWindow:(UIWindow *)window;
 @property (nonatomic, retain) UITabBarController *  tabcon;
 
 /// ViewController responsible for account management and registration.

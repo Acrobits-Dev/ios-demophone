@@ -31,9 +31,7 @@
 
 @implementation CallViewController
 
-// ******************************************************************
 - (void) viewDidLoad
-// ******************************************************************
 {
     [super viewDidLoad];
     [[demophoneAppDelegate theApp] addTargetChangeDelegate:self];
@@ -44,16 +42,12 @@
     [self refresh];
 }
 
-// ******************************************************************
 - (void)dealloc
-// ******************************************************************
 {
     [[demophoneAppDelegate theApp] removeTargetChangeDelegate:self];
 }
 
-// ******************************************************************
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
-// ******************************************************************
 {
     if ([segue.identifier isEqualToString:@"TARGET_PICKER"])
     {
@@ -63,11 +57,9 @@
     }
 }
 
-// ******************************************************************
 /// @brief refreshes the @ref CallDataSource to get the most up-to-date image of call repository and reloads the
 /// UITableView. It tries to select the same item as before refresh (if it still exists).
 - (void) refresh
-// ******************************************************************
 {
     NSIndexPath * path = [self.callTable indexPathForSelectedRow];
     
@@ -89,9 +81,7 @@
     }
 }
 
-// ******************************************************************
 -(Entry *) selectedEntry
-// ******************************************************************
 {
     NSIndexPath * path = [self.callTable indexPathForSelectedRow];
     if(!path) return nil;
@@ -99,9 +89,7 @@
     return [self.callDataSource entryForIndexPath:path];
 }
 
-// ******************************************************************
 -(ali::string) groupNotContainingCall:(Softphone::EventHistory::CallEvent::Pointer) call
-// ******************************************************************
 {
     const ali::string groupId = [demophoneAppDelegate theApp].softphone->calls()->conferences()->get(call);
     const ali::array_set<ali::string> allGroups = [demophoneAppDelegate theApp].softphone->calls()->conferences()->list();
@@ -118,9 +106,7 @@
     return ali::string();
 }
 
-// ******************************************************************
 -(Softphone::EventHistory::CallEvent::Pointer) otherCall:(Softphone::EventHistory::CallEvent::Pointer) call
-// ******************************************************************
 {
     // find another call. Pick the first call found, the proper GUI should let the
 	// user choose the call to transfer to
@@ -143,9 +129,7 @@
     return nullptr;
 }
 
-// ******************************************************************
 -(ali::string) selectedGroupId
-// ******************************************************************
 {
     Entry * e = [self selectedEntry];
     if(e == nullptr)
@@ -157,17 +141,13 @@
         return [demophoneAppDelegate theApp].softphone->calls()->conferences()->get(e.call);
 }
 
-// ******************************************************************
 -(void) alertNoCallSelected
-// ******************************************************************
 {
     [self showAlertWithTitle:@"Error"
                   andMessage:@"No call selected"];
 }
 
-// ******************************************************************
 - (void)showCompleteAttTransferAlert
-// ******************************************************************
 {
     auto callRedirectionManager = Softphone::SdkServiceLocator::getCallRedirectionManager();
     
@@ -193,11 +173,9 @@
     [self presentViewController:alert animated:YES completion:nil];
 }
 
-// ******************************************************************
 /// @brief Hangs up a call if call is selected, or all calls in a group if
 /// group is selected.
 -(IBAction) onHangup
-// ******************************************************************
 {
     Entry * e = [self selectedEntry];
     if(!e)
@@ -216,23 +194,18 @@
     [self refresh];
 }
 
-// ******************************************************************
 /// Toggles the microphone mute. Applies globally.
 -(IBAction) onMute
-// ******************************************************************
 {
 	[[demophoneAppDelegate theApp] toggleMute];
 }
 
-// ******************************************************************
 /// Toggles speakerphone mode. Applies globally.
 -(IBAction) onSpeaker
-// ******************************************************************
 {
 	[[demophoneAppDelegate theApp] toggleSpeaker];
 }
 
-// ******************************************************************
 /// @brief Toggles to hold state of the selected call, or the active
 /// state of the whole group.
 ///
@@ -240,7 +213,6 @@
 /// Instead, the local audio (microphone+playback) is disconnected from the group, but the media mixing contimues, so
 /// the two or more remaining participants can still hear each other.
 -(IBAction) onHold
-// ******************************************************************
 {
     Entry * e = [self selectedEntry];
     if(!e)
@@ -259,13 +231,11 @@
 } 
 
 
-// ******************************************************************
 /// @brief Joins the selected call to the first group which is found
 ///
 /// In case a group is selected, or in case no group which doesn't contain the selected call is found, an error
 /// message is shown.
 -(IBAction) onJoin
-// ******************************************************************
 {
     Entry * e = [self selectedEntry];
     if(!e)
@@ -293,12 +263,10 @@
 	[[demophoneAppDelegate theApp] joinCall:e.call toGroup:otherGroup];
 }
 
-// ******************************************************************
 /// @brief Depending on whether group or call is selected, it calls the @ref demophoneAppDelegate#splitGroup: or
 /// @ref demophoneAppDelegate#splitCall: method. Shows an error message if called with a group which already has only
 /// one participant.
 -(IBAction) onSplit
-// ******************************************************************
 {
     Entry * e = [self selectedEntry];
     if(!e)
@@ -326,10 +294,8 @@
     }
 }
 
-// ******************************************************************
 /// @brief makes sure that a single call is selected and calls @ref demophoneAppDelegate#transferCall:
 -(IBAction) onXfr
-// ******************************************************************
 {
     Entry * e = [self selectedEntry];
     if(!e)
@@ -354,12 +320,10 @@
     }
 }
 
-// ******************************************************************
 /// @brief makes sure that a single call is selected, then finds some other (random) call id which is different and
 /// calls @ref <demophoneAppDelegate::attendedTransferFromCall:to:>
 /// Proper GUI should have some picker where the user picks the call to transfer to.
 -(IBAction) onAttendedXfr
-// ******************************************************************
 {
     Entry * e = [self selectedEntry];
     if(!e)
@@ -403,11 +367,9 @@
     }
 }
 
-// ******************************************************************
 /// @brief called in response to touchDown event. Starts the DTMF tone by calling
 /// @ref demophoneAppDelegate#dtmfOnForKey:
 -(IBAction) dtmfOn:(id)sender
-// ******************************************************************
 {
 	UIView * v = (UIView *)sender;
 	char key;
@@ -420,20 +382,16 @@
 	[[demophoneAppDelegate theApp] dtmfOnForKey:key];
 }
 
-// ******************************************************************
 /// @brief called in response to touchUp or touchCanceled event. Stops the DTMF tone by calling
 /// @ref demophoneAppDelegate#dtmfOff
 -(IBAction) dtmfOff:(id)sender
-// ******************************************************************
 {
 	[[demophoneAppDelegate theApp] dtmfOff];	
 }
 
-// ******************************************************************
 /// @brief Makes sure the selected item is a single call in states IncomingRingong or IncomingIgnored and calls
 /// @ref demophoneAppDelegate#answerIncomingCall: to answer the call.
 -(IBAction) onAnswer
-// ******************************************************************
 {
     Entry * e = [self selectedEntry];
     if(!e)
@@ -459,11 +417,9 @@
     }
 }
 
-// ******************************************************************
 /// @brief Makes sure the selected item is a single call in states IncomingRingong or IncomingIgnored and calls
 /// @ref demophoneAppDelegate#rejectIncomingCall: to reject the call.
 -(IBAction) onReject
-// ******************************************************************
 {
     Entry * e = [self selectedEntry];
     if(!e)
@@ -489,23 +445,17 @@
     }
 }
 
-// ******************************************************************
 -(IBAction)onStartSimulatedMic
-// ******************************************************************
 {
     [[demophoneAppDelegate theApp] startSimulatedMicrophone];
 }
 
-// ******************************************************************
 -(IBAction)onStopSimulatedMic
-// ******************************************************************
 {
     [[demophoneAppDelegate theApp] stopSimulatedMicrophone];
 }
 
-// ******************************************************************
 - (void)pickerViewController:(TargetPickerViewController *)picker didSelectTarget:(Softphone::EventHistory::CallEvent::Pointer)target
-// ******************************************************************
 {
     auto callRedirectionManager = Softphone::SdkServiceLocator::getCallRedirectionManager();
     callRedirectionManager->setAttendedTransferTarget(target);
@@ -514,9 +464,7 @@
     [picker dismissViewControllerAnimated:YES completion:nil];
 }
 
-// ******************************************************************
 - (void)pickerViewControllerDidCancel:(TargetPickerViewController *)picker
-// ******************************************************************
 {
     auto callRedirectionManager = Softphone::SdkServiceLocator::getCallRedirectionManager();
     callRedirectionManager->cancelRedirect();
@@ -525,9 +473,7 @@
 }
 
 #pragma mark - CallRedirectionTargetChangeDelegate
-// ******************************************************************
 -(void)redirectTargetChanged:(Call::Redirection::Callbacks::TargetChangeData const&) data
-// ******************************************************************
 {
     if (!data.newTarget.is_null() && data.type == Call::Redirection::RedirectType::AttendedTransfer()) {
         [self showCompleteAttTransferAlert];

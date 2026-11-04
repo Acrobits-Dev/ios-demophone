@@ -43,20 +43,16 @@
     BOOL _outgoingVideoEnabled;
 }
 
-// ******************************************************************
 NSNumber * keyFromEvent(Softphone::EventHistory::Event::Pointer  event)
-// ******************************************************************
 {
     return [NSNumber numberWithLong:reinterpret_cast<long>(event.get())];
 }
 
 
-// ******************************************************************
 /// @brief when loaded, the device cameras are enumerated and stored in _cameras array to be used as UITableView data source.
 /// Then the video preview (local image) is initialized, positioned and the video layer is set from @ref
 /// Softphone::InstanceVideo interface.
 - (void) viewDidLoad
-// ******************************************************************
 {
     [super viewDidLoad];
 
@@ -89,11 +85,9 @@ NSNumber * keyFromEvent(Softphone::EventHistory::Event::Pointer  event)
     [self prepareCameraInfosMenu];
 }
 
-// ******************************************************************
 /// @brief when shown, we update the screen and start the periodic refresh timer. We also start getting notifications
 /// about device orientation changes, to be able to auto-rotate the video views properly
 - (void) viewWillAppear:(BOOL)animated
-// ******************************************************************
 {
     [super viewWillAppear:animated];
 
@@ -105,10 +99,8 @@ NSNumber * keyFromEvent(Softphone::EventHistory::Event::Pointer  event)
     [self performSelector:@selector(periodicUpdate) withObject:nil afterDelay:0.0f];
 }
 
-// ******************************************************************
 /// @brief stopt the refresh timer, stop getting orientation changes
 - (void)viewDidDisappear:(BOOL)animated
-// ******************************************************************
 {
     [super viewDidDisappear: animated];
     _showing = NO;
@@ -116,11 +108,9 @@ NSNumber * keyFromEvent(Softphone::EventHistory::Event::Pointer  event)
     [[NSNotificationCenter defaultCenter] removeObserver:self name: UIDeviceOrientationDidChangeNotification object: nil];
 }
 
-// ******************************************************************
 /// @brief during periodic update, we make sure that the video preview reflects exactly what is being sent to the
 // remote side. This depends on the device orientation, codec capabilities and selected video resolution.
 -(void) periodicUpdate
-// ******************************************************************
 {
     [self updateVideoPreview];
 
@@ -128,7 +118,6 @@ NSNumber * keyFromEvent(Softphone::EventHistory::Event::Pointer  event)
         [self performSelector:@selector(periodicUpdate) withObject:nil afterDelay:1.0f];
 }
 
-// ******************************************************************
 /** @brief
  actual video frame which is encoded and sent out may be a crop of the actually selected native iOS resolution.
  The code below transforms and crops the preview view to make sure it looks exactly like the video
@@ -136,7 +125,6 @@ NSNumber * keyFromEvent(Softphone::EventHistory::Event::Pointer  event)
  @ref Softphone#InstanceVideo#getPreviewLayerCroppingRect and @ref Softphone#InstanceVideo#getPreviewLayerFlipTransform
  */
 -(void) updateVideoPreview
-// ******************************************************************
 {
     if(self.videoPreviewContainer == 0)
         return;     // view not loaded, too early?
@@ -144,11 +132,9 @@ NSNumber * keyFromEvent(Softphone::EventHistory::Event::Pointer  event)
     [self.videoPreviewView updatePositionAndOrientation];
 }
 
-// ******************************************************************
 ///@brief creates a mosaic of remote video views. Support for video conferencing is quite basic, server-side
 ///conferencing support will be needed, mixing the video locally is very bandwidth-intensive
 -(void) positionVideoViews
-// ******************************************************************
 {
     if(_videoViews == nil)
         return;
@@ -173,10 +159,8 @@ NSNumber * keyFromEvent(Softphone::EventHistory::Event::Pointer  event)
     }
 }
 
-// ******************************************************************
 ///@brief makes sure that video views for the currently active call (or group of calls) are created and visible
 -(void) refresh
-// ******************************************************************
 {
     if(_videoViews == nil)
         _videoViews = [[NSMutableDictionary alloc] init];
@@ -254,10 +238,8 @@ NSNumber * keyFromEvent(Softphone::EventHistory::Event::Pointer  event)
     self.switchCameraButton.hidden = !_outgoingVideoEnabled;
 }
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 ///@brief Make sure the remote video views rotate with the device for comfortable viewing
 -(void) onOrientationChanged: (NSNotification*) notification
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     UIDeviceOrientation deviceOrientation = [[UIDevice currentDevice] orientation];
 
@@ -290,18 +272,14 @@ NSNumber * keyFromEvent(Softphone::EventHistory::Event::Pointer  event)
     [self positionVideoViews];
 }
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 ///@brief callbacks from @ref SoftphoneVideoViews are not handled by this example implementation. In case the
 ///remote side changed the video resolution, this callback would be called and we may want to adjust the videoview frame
 -(void) onFrameSizeChanged: (SoftphoneVideoView *) view
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     // video dimensions have changed - we may need to re-arrange the video views
 }
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 - (void)prepareCameraInfosMenu
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     ali::array_set<Video::Capture::CameraInfo> infos = [demophoneAppDelegate theApp].softphone->video()->enumerateCameras();
     
@@ -333,9 +311,7 @@ NSNumber * keyFromEvent(Softphone::EventHistory::Event::Pointer  event)
     _switchCameraButton.showsMenuAsPrimaryAction = YES;
 }
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 - (void)updateDesiredMedia:(Call::DesiredMedia const&)desiredMedia
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     ali::opt_string activeGroup = [demophoneAppDelegate theApp].softphone->calls()->conferences()->getActive();
     if(activeGroup.is_null())
@@ -352,9 +328,7 @@ NSNumber * keyFromEvent(Softphone::EventHistory::Event::Pointer  event)
 
 #pragma mark - IBActions
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 - (IBAction)onEndCall
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     ali::opt_string const activeGroup = [demophoneAppDelegate theApp].softphone->calls()->conferences()->getActive();
     if(activeGroup.is_null())
@@ -363,9 +337,7 @@ NSNumber * keyFromEvent(Softphone::EventHistory::Event::Pointer  event)
     [[demophoneAppDelegate theApp] hangupGroup:*activeGroup];
 }
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 - (IBAction)onToggleVideo
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     auto callDesiredMedia = Call::DesiredMedia(_incomingVideoEnabled, !_videoButton.isSelected);
     [self updateDesiredMedia:callDesiredMedia];

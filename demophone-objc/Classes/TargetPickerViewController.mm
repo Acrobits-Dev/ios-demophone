@@ -1,9 +1,7 @@
 #import "TargetPickerViewController.h"
 #import "demophoneAppDelegate.h"
 
-// ******************************************************************
 @interface TargetPickerViewController () <UITableViewDelegate, UITableViewDataSource>
-// ******************************************************************
 {
     ali::array<Softphone::EventHistory::CallEvent::Pointer> _attendedTransferTargets;
 }
@@ -12,34 +10,24 @@
 
 @end
 
-// ******************************************************************
 @implementation TargetPickerViewController
-// ******************************************************************
 
-// ******************************************************************
 - (void)viewDidLoad
-// ******************************************************************
 {
     [super viewDidLoad];
 }
 
-// ******************************************************************
 - (void)setAttendedTransferTargets:(ali::array<Softphone::EventHistory::CallEvent::Pointer> const&)targets
-// ******************************************************************
 {
     _attendedTransferTargets = targets;
 }
 
-// ******************************************************************
 - (NSInteger)tableView:(nonnull UITableView *)tableView numberOfRowsInSection:(NSInteger)section
-// ******************************************************************
 {
     return _attendedTransferTargets.size();
 }
 
-// ******************************************************************
 - (UITableViewCell *)tableView:(nonnull UITableView *)tableView cellForRowAtIndexPath:(nonnull NSIndexPath *)indexPath
-// ******************************************************************
 {
     static NSString *MyIdentifier = @"CallCell";
     
@@ -60,9 +48,7 @@
     return cell;
 }
 
-// ******************************************************************
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
-// ******************************************************************
 {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     if (_pickerDelgate && [_pickerDelgate respondsToSelector:@selector(pickerViewController:didSelectTarget:)])
@@ -72,9 +58,7 @@
     }
 }
 
-// ******************************************************************
 -(IBAction)onClose:(id)sender
-// ******************************************************************
 {
     if (_pickerDelgate && [_pickerDelgate respondsToSelector:@selector(pickerViewControllerDidCancel:)])
     {

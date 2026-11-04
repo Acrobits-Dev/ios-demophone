@@ -10,9 +10,7 @@
 
 @protocol TargetPickerDelegate;
 
-// ******************************************************************
 @interface TargetPickerViewController : UIViewController
-// ******************************************************************
 
 @property (nonatomic, weak) id<TargetPickerDelegate> pickerDelgate;
 
@@ -21,9 +19,7 @@
 @end
 
 
-// ******************************************************************
 @protocol TargetPickerDelegate <NSObject>
-// ******************************************************************
 
 - (void)pickerViewController:(TargetPickerViewController *)picker didSelectTarget:(Softphone::EventHistory::CallEvent::Pointer)target;
 

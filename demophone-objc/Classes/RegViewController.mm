@@ -28,9 +28,7 @@
 
 @implementation RegViewController
 
-// ******************************************************************
 - (void)viewDidLoad
-// ******************************************************************
 {
     [super viewDidLoad];
     
@@ -50,25 +48,19 @@
     }
 }
 
-// ******************************************************************
 - (void)dealloc
-// ******************************************************************
 {
     [[demophoneAppDelegate theApp] removeStateChangeDelegate:self];
 }
 
-// ******************************************************************
 - (BOOL)textFieldShouldReturn:(UITextField *)textField
-// ******************************************************************
 {
 	[textField resignFirstResponder];
 
 	return YES;
 }
 
-// ******************************************************************
 - (void)startCallWithDialAction:(NSString *)dialAction
-// ******************************************************************
 {
     auto callRedirectionManager = Softphone::SdkServiceLocator::getCallRedirectionManager();
     if (callRedirectionManager->getCurrentRedirectFlow() == Call::Redirection::RedirectType::BlindTransfer()) {
@@ -87,9 +79,7 @@
 }
 
 #pragma mark - CallRedirectionStateChangeDelegate
-// ******************************************************************
 -(void)redirectStateChanged:(Call::Redirection::Callbacks::StateChangeData const&) data
-// ******************************************************************
 {
     _callButton.selected = data.type == Call::Redirection::RedirectType::BlindTransfer() && data.newState == Call::Redirection::RedirectState::SourceAssigned();
     
@@ -119,58 +109,42 @@
 
 #pragma mark - IBActions
 
-// ******************************************************************
 - (IBAction) onTapGesture
-// ******************************************************************
 {
     [self.view endEditing:YES];
 }
 
-// ******************************************************************
 - (IBAction) onCall
-// ******************************************************************
 {
     [self startCallWithDialAction:@"voiceCall"];
 }
 
-// ******************************************************************
 - (IBAction) onVideoCall
-// ******************************************************************
 {
     [self startCallWithDialAction:@"videoCall"];
 }
 
-// ******************************************************************
 -(IBAction) dumpLog
-// ******************************************************************
 {
 	[[demophoneAppDelegate theApp] dumpLog];
 }
 
-// ******************************************************************
 -(IBAction) onRegister
-// ******************************************************************
 {
 	[[demophoneAppDelegate theApp] registerAccount];
 }
 
-// ******************************************************************
 -(IBAction) onUnregister
-// ******************************************************************
 {
 	[[demophoneAppDelegate theApp] unregisterAccount];
 }
 
-// ******************************************************************
 -(IBAction) onSendSMS
-// ******************************************************************
 {
 	[[demophoneAppDelegate theApp] sendExampleSMSTo: [self.number text]];
 }
 
-// ******************************************************************
 -(IBAction) onSendSMSWithAttachment
-// ******************************************************************
 {
     [[demophoneAppDelegate theApp] sendExampleSMSWithAttachmentTo: [self.number text]];
 }

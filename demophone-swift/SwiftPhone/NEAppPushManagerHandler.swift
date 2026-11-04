@@ -2,9 +2,7 @@ import Foundation
 import NetworkExtension
 import Combine
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 class NEAppPushManagerHandler : NSObject
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     static let instance = NEAppPushManagerHandler()
     private var pushManager: NEAppPushManager?
@@ -18,16 +16,12 @@ class NEAppPushManagerHandler : NSObject
     
     private var pushManagerIsActiveCancellable: AnyCancellable?
     
-    //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     private override init()
-    //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
         super.init()
     }
     
-    //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     func initialize(completion: ((Error?) -> Void)? = nil)
-    //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
         NEAppPushManager.loadAllFromPreferences { [weak self] managers, error in
             precondition(Thread.isMainThread)
@@ -60,9 +54,7 @@ class NEAppPushManagerHandler : NSObject
         }
     }
     
-    //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     func update(config: NEAppPushManagerConfig, completion: ((Error?) -> Void)? = nil)
-    //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
         if pushConfig == config {
             completion?(nil)
@@ -95,9 +87,7 @@ class NEAppPushManagerHandler : NSObject
         savePushManagerPreferences(reload: true, completion: completion)
     }
     
-    //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     private func savePushManagerPreferences(reload: Bool = false, completion: ((Error?) -> Void)? = nil)
-    //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
         pushManager?.saveToPreferences(completionHandler: { [weak self] error in
             precondition(Thread.isMainThread)
@@ -118,9 +108,7 @@ class NEAppPushManagerHandler : NSObject
         })
     }
     
-    //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     private func loadPushManagerPreferences(completion: ((Error?) -> Void)? = nil)
-    //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
         pushManager?.loadFromPreferences(completionHandler: { error in
             precondition(Thread.isMainThread)
@@ -135,22 +123,16 @@ class NEAppPushManagerHandler : NSObject
         })
     }
     
-    //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     deinit
-    //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
         pushManager?.removeObserver(self, forKeyPath: #keyPath(NEAppPushManager.isActive))
     }
 }
 
 // MARK: - NEAppPushDelegate
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 extension NEAppPushManagerHandler : NEAppPushDelegate
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
-    //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     func appPushManager(_ manager: NEAppPushManager, didReceiveIncomingCallWithUserInfo userInfo: [AnyHashable : Any] = [:])
-    //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
         // Handle incoming call information
         print("[NEPushManagerHandler] Received incoming call user info: \(userInfo)")

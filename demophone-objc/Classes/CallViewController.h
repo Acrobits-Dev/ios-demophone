@@ -23,9 +23,7 @@
  Action buttons apply either globally (like mute/unmute, speakerphone on/off) or on the call or call group which
  is currently selected. 
  */
-// ******************************************************************
 @interface CallViewController : UIViewController <UITextFieldDelegate>
-// ******************************************************************
 
 
 @property(nonatomic,strong) CallDataSource * callDataSource;

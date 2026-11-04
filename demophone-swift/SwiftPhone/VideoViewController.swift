@@ -1,9 +1,7 @@
 
 import UIKit
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 class VideoViewController: UIViewController
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     @IBOutlet weak var videoContainer: UIView!
     @IBOutlet weak var videoPreviewContainer: UIView!
@@ -16,13 +14,10 @@ class VideoViewController: UIViewController
     private var videoViews: Dictionary<String, VideoView>?
     
     
-    //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     /// @brief when loaded, the device cameras are enumerated and stored in _cameras array to be used as UITableView data source.
     /// Then the video preview (local image) is initialized, positioned and the video layer is set from @ref
     /// Softphone::InstanceVideo interface.
-    //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     override func viewDidLoad()
-    //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
         if cameras.count == 0
         {
@@ -30,12 +25,9 @@ class VideoViewController: UIViewController
         }
     }
     
-    //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     /// @brief when shown, we update the screen and start the periodic refresh timer. We also start getting notifications
     /// about device orientation changes, to be able to auto-rotate the video views properly
-    //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     override func viewWillAppear(_ animated: Bool)
-    //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
         super.viewWillAppear(animated)
         
@@ -47,11 +39,8 @@ class VideoViewController: UIViewController
         self.perform(#selector(periodicUpdate), with: nil, afterDelay: 0.0)
     }
     
-    //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     /// @brief stop the refresh timer, stop getting orientation changes
-    //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     override func viewDidDisappear(_ animated: Bool)
-    //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
         super.viewDidDisappear(animated)
         
@@ -60,12 +49,9 @@ class VideoViewController: UIViewController
         NotificationCenter.default.removeObserver(self, name: UIDevice.orientationDidChangeNotification, object: nil)
     }
     
-    //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     /// @brief during periodic update, we make sure that the video preview reflects exactly what is being sent to the
     // remote side. This depends on the device orientation, codec capabilities and selected video resolution.
-    //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     @objc private func periodicUpdate()
-    //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
         updateVideoPreview()
         
@@ -75,26 +61,20 @@ class VideoViewController: UIViewController
         }
     }
     
-    //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     /** @brief
      actual video frame which is encoded and sent out may be a crop of the actually selected native iOS resolution.
      The code below transforms and crops the preview view to make sure it looks exactly like the video
      displayed at the remote side. @ref Softphone::InstanceVideo supports us by providing
      @ref Softphone#InstanceVideo#getPreviewLayerCroppingRect and @ref Softphone#InstanceVideo#getPreviewLayerFlipTransform
      */
-    //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     private func updateVideoPreview()
-    //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
         
     }
     
-    //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     ///@brief creates a mosaic of remote video views. Support for video conferencing is quite basic, server-side
     ///conferencing support will be needed, mixing the video locally is very bandwidth-intensive
-    //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     private func positionVideoViews()
-    //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
         guard let v = videoViews else {
             return;
@@ -121,11 +101,8 @@ class VideoViewController: UIViewController
         }
     }
     
-    //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     ///@brief makes sure that video views for the currently active call (or group of calls) are created and visible
-    //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     func refresh()
-    //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
         if videoViews == nil
         {
@@ -187,11 +164,8 @@ class VideoViewController: UIViewController
 //        self.videoPreviewContainer.isHidden = videoViews?.count == 0
     }
     
-    //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     ///@brief Make sure the remote video views rotate with the device for comfortable viewing
-    //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     @objc private func onOrientationChanged()
-    //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
         let deviceOrientation = UIDevice.current.orientation
         
@@ -224,11 +198,8 @@ class VideoViewController: UIViewController
     
     // MARK: - IBActions -
 
-    //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     ///@brief gets the selected camera from the tableview and sets it as current active camera
-    //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     @IBAction func onSetCamera(_ sender: Any)
-    //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
         guard let selectedIndexPath = self.cameraTable.indexPathForSelectedRow else
         {
@@ -239,12 +210,9 @@ class VideoViewController: UIViewController
         SoftphoneBridge.instance()?.video()?.switchCamera(id: cameraId)
     }
     
-    //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     ///@brief gets the currently selected desired media (voice-only, voice+video) and sets it to all the calls in
     /// currently active call group
-    //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     @IBAction func onUpdateDesiredMedia(_ sender: Any)
-    //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
         guard let activeGroup = SoftphoneBridge.instance()?.calls()?.conferences()?.getActive() else
         {
@@ -260,20 +228,14 @@ class VideoViewController: UIViewController
     }
 }
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 extension VideoViewController: UITableViewDelegate, UITableViewDataSource
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
-    //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int
-    //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
         return cameras.count
     }
     
-    //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell
-    //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
         let cell = tableView.dequeueReusableCell(withIdentifier: "CameraCell")!
         
@@ -283,9 +245,7 @@ extension VideoViewController: UITableViewDelegate, UITableViewDataSource
         return cell
     }
     
-    //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat
-    //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     {
         return 28.0
     }

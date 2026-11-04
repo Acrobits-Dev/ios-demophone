@@ -21,6 +21,7 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		A10000000000000000000002 /* SceneDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000001 /* SceneDelegate.mm */; };
 		1D3623260D0F684500981E51 /* demophoneAppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1D3623250D0F684500981E51 /* demophoneAppDelegate.mm */; };
 		1D60589B0D05DD56006BFB54 /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.mm */; };
 		1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
@@ -93,6 +94,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		A10000000000000000000001 /* SceneDelegate.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = SceneDelegate.mm; sourceTree = "<group>"; };
+		A10000000000000000000003 /* SceneDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SceneDelegate.h; sourceTree = "<group>"; };
 		1D30AB110D05D00D00671497 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		1D3623240D0F684500981E51 /* demophoneAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = demophoneAppDelegate.h; sourceTree = "<group>"; };
 		1D3623250D0F684500981E51 /* demophoneAppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = demophoneAppDelegate.mm; sourceTree = "<group>"; };
@@ -199,6 +202,8 @@
 				4839D2B11547483B00048DB1 /* CallViewController.mm */,
 				1D3623240D0F684500981E51 /* demophoneAppDelegate.h */,
 				1D3623250D0F684500981E51 /* demophoneAppDelegate.mm */,
+				A10000000000000000000001 /* SceneDelegate.mm */,
+				A10000000000000000000003 /* SceneDelegate.h */,
 				2CC20EA81F025E9300868D99 /* NSDictionary+XML.h */,
 				2CC20EA91F025E9300868D99 /* NSDictionary+XML.mm */,
 				48DF6E4D13C7015800113EEF /* NSString+CallState.h */,
@@ -426,6 +431,7 @@
 			files = (
 				1D60589B0D05DD56006BFB54 /* main.mm in Sources */,
 				1D3623260D0F684500981E51 /* demophoneAppDelegate.mm in Sources */,
+				A10000000000000000000002 /* SceneDelegate.mm in Sources */,
 				C2551FC92A8E636B0032E967 /* UIViewController+Alert.mm in Sources */,
 				28D7ACF80DDB3853001CB0EB /* RegViewController.mm in Sources */,
 				485117FA11640B870051577E /* SoftphoneObserverProxy.mm in Sources */,
@@ -527,6 +533,7 @@
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "c++20";
 				GCC_ENABLE_CPP_RTTI = NO;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -536,6 +543,7 @@
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "c++20";
 				GCC_ENABLE_CPP_RTTI = NO;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;

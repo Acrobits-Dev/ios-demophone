@@ -21,9 +21,7 @@
  The ViewController mostly receives the commands from the user and forwards them to @ref demophoneAppDelegate.
  */
 
-// ******************************************************************
 @interface RegViewController : UIViewController <UITextFieldDelegate>
-// ******************************************************************
 
 @property(nonatomic,weak,readonly) UILabel * regState;
 @property(nonatomic,weak,readonly) UITextField * number;

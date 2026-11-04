@@ -14,9 +14,7 @@
 #include "ali/ali_string.h"
 #include "Softphone/Softphone.h"
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 @interface Entry : NSObject
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     Softphone::EventHistory::CallEvent::Pointer _callEvent;
 }
@@ -36,9 +34,7 @@
  call groups taken from libsoftphone. 
  */
 
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 @interface CallDataSource : NSObject<UITableViewDataSource>
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 {
     NSArray * _entries;
 }
